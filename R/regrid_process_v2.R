@@ -53,5 +53,10 @@ for (product in rea_products) {
   file.remove(file_tmp)
   
   message(product, " : traitement terminé et sauvegardé.")
+  
+  # Clean RAM
+  rm(data, oisst, regrid_product, file_rea)
+  gc()
+
 }
 
