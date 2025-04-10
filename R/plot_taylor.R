@@ -1,192 +1,171 @@
-source("function_taylor.R")
+# Charger les fonctions
+source("R./function_taylor.R")
 
-oisst = read.table(file = "C:/Users/jdanielou/Desktop/plots_internship/ts_csv/oisst/oisst_sp.csv")
-hycom = read.table(file = "C:/Users/jdanielou/Desktop/plots_internship/ts_csv/hycom/hycom_sp.csv")
-bran = read.table(file = "C:/Users/jdanielou/Desktop/plots_internship/ts_csv/bran/bran_sp.csv")
-glorys = read.table(file = "C:/Users/jdanielou/Desktop/plots_internship/ts_csv/glorys/glorys_sp.csv")
+# Définir les chemins de base
+base_path <- "C:/Users/jdanielou/Desktop/plot_internship/ts_csv"
+products <- c("oisst", "hycom", "bran", "glorys")
+zones <- c("", "west", "center", "east")
 
-oisst_west = read.table(file = "C:/Users/jdanielou/Desktop/plots_internship/ts_csv/oisst/oisst_west.csv")
-hycom_west = read.table(file = "C:/Users/jdanielou/Desktop/plots_internship/ts_csv/hycom/hycom_west.csv")
-bran_west = read.table(file = "C:/Users/jdanielou/Desktop/plots_internship/ts_csv/bran/bran_west.csv")
-glorys_west = read.table(file = "C:/Users/jdanielou/Desktop/plots_internship/ts_csv/glorys/glorys_west.csv")
-
-oisst_center = read.table(file = "C:/Users/jdanielou/Desktop/plots_internship/ts_csv/oisst/oisst_center.csv")
-hycom_center = read.table(file = "C:/Users/jdanielou/Desktop/plots_internship/ts_csv/hycom/hycom_center.csv")
-bran_center = read.table(file = "C:/Users/jdanielou/Desktop/plots_internship/ts_csv/bran/bran_center.csv")
-glorys_center = read.table(file = "C:/Users/jdanielou/Desktop/plots_internship/ts_csv/glorys/glorys_center.csv")
-
-oisst_east = read.table(file = "C:/Users/jdanielou/Desktop/plots_internship/ts_csv/oisst/oisst_east.csv")
-hycom_east = read.table(file = "C:/Users/jdanielou/Desktop/plots_internship/ts_csv/hycom/hycom_east.csv")
-bran_east = read.table(file = "C:/Users/jdanielou/Desktop/plots_internship/ts_csv/bran/bran_east.csv")
-glorys_east = read.table(file = "C:/Users/jdanielou/Desktop/plots_internship/ts_csv/glorys/glorys_east.csv")
-
-
-oisst = oisst$V1
-oisst_west = oisst_west$V1
-oisst_center = oisst_center$V1
-oisst_east = oisst_east$V1
-
-glorys = glorys$V1
-glorys_west = glorys_west$V1
-glorys_center = glorys_center$V1
-glorys_east = glorys_east$V1
-
-bran = bran$V1
-bran_west = bran_west$V1
-bran_center = bran_center$V1
-bran_east = bran_east$V1
-
-hycom = hycom$V1
-hycom_west = hycom_west$V1
-hycom_center = hycom_center$V1
-hycom_east = hycom_east$V1
-
-years <- rep(1993:2021, each = 12)
-oisst_years = split(oisst, years)
-glorys_years = split(glorys, years)
-bran_years = split(bran, years)
-hycom_years = split(hycom, years[13:276])
-
-years <- rep(1993:2021, each = 1)
-
-dates <- seq(as.Date("1993-01-01"), by = "month", length.out = length(oisst))
-
-# Extraire les mois
-months <- as.numeric(format(dates, "%m"))
-
-# Fonction pour attribuer une saison selon le mois (hémisphère sud)
-get_south_season <- function(month) {
-  if (month %in% c(12, 1, 2)) return("Été")
-  if (month %in% c(3, 4, 5))  return("Automne")
-  if (month %in% c(6, 7, 8))  return("Hiver")
-  if (month %in% c(9,10,11))  return("Printemps")
+# Fonction pour charger les fichiers et extraire la colonne V1
+load_data <- function(product, zone = "") {
+  suffix <- if (zone == "") product else paste0(product, "_", zone)
+  file_path <- file.path(base_path, product, paste0(suffix, ".csv"))
+  read.table(file_path)$V1
 }
 
-# Appliquer la fonction à chaque mois
-seasons <- sapply(months, get_south_season)
+# Charger toutes les données dans une liste nommée
+data_list <- list()
+for (prod in products) {
+  for (zone in zones) {
+    name <- if (zone == "") prod else paste0(prod, "_", zone)
+    data_list[[name]] <- load_data(prod, zone)
+  }
+}
 
-# Grouper les données par saison
-oisst_season <- split(oisst, seasons)
-glorys_season <- split(glorys, seasons)
-bran_season <- split(bran, seasons)
-hycom_season <- split(hycom, seasons[13:276])
+# Création des années/mois
+dates <- seq(as.Date("1993-01-01"), by = "month", length.out = length(data_list$oisst))
+years <- format(dates, "%Y")
+months <- as.numeric(format(dates, "%m"))
 
+# Fonction de découpe par année
+split_by_year <- function(ts, offset = 0) {
+  split(ts, as.numeric(years)[(1 + offset):(length(ts) + offset)])
+}
+
+# Fonction d'attribution de saison (hémisphère sud)
+get_south_season <- function(month) {
+  switch(as.character(month),
+         "12" = "Été", "1" = "Été", "2" = "Été",
+         "3" = "Automne", "4" = "Automne", "5" = "Automne",
+         "6" = "Hiver", "7" = "Hiver", "8" = "Hiver",
+         "9" = "Printemps", "10" = "Printemps", "11" = "Printemps")
+}
+
+# Regrouper les données par saison
+seasons_vec <- sapply(months, get_south_season)
+split_by_season <- function(ts, offset = 0) {
+  split(ts, seasons_vec[(1 + offset):(length(ts) + offset)])
+}
+
+# Split des séries temporelles par années et saisons
+data_years <- list(
+  oisst = split_by_year(data_list$oisst),
+  glorys = split_by_year(data_list$glorys),
+  bran = split_by_year(data_list$bran),
+  hycom = split_by_year(data_list$hycom, offset = 12)
+)
+
+data_seasons <- list(
+  oisst = split_by_season(data_list$oisst),
+  glorys = split_by_season(data_list$glorys),
+  bran = split_by_season(data_list$bran),
+  hycom = split_by_season(data_list$hycom, offset = 12)
+)
+
+# Paramètres de tracé
 seasons <- c("Hiver", "Printemps", "Été", "Automne")
 season_colors <- c("Hiver" = "navy", "Printemps" = "forestgreen", "Été" = "darkorange", "Automne" = "firebrick")
 season_pch <- c("Hiver" = 15, "Printemps" = 16, "Été" = 17, "Automne" = 18)
+spatial_colors <- c("west" = "peru", "center" = "magenta3", "east" = "turquoise3")
+spatial_pch <- c("west" = 15, "center" = 16, "east" = 17)
 
-x11(width = 20, height = 18)
-par(mfrow=c(3,3), oma = c(0, 10, 0, 0))
-
-#-----------------PLOT GLORYS YEARS--------------------
-taylor.diagram(oisst_years[["1993"]],glorys_years[["1993"]], "", col="grey40", pcex=1, tcex=1.2,
-               pos.cor=TRUE)
-
-for(year in years[2:29]) {
-  year = as.character(year)
-  taylor.diagram(oisst_years[[year]],glorys_years[[year]], "", col="grey40", pcex=1, tcex=1.2,
-                 pos.cor=TRUE, labpos = 1, add=TRUE)
-}
-taylor.diagram(oisst, glorys, "", col="red", pcex=2, tcex=1.2,
-               pos.cor=TRUE, labpos = 1, add=TRUE)
-
-legend(1,1.8, legend = c("Year (1993 - 2021)", "All Years Combined"),
-       col = c("grey", "red"), bty = "n", pch = c(19,19), pt.cex = 1.5, cex=1.2)
-
-#-----------------PLOT GLORYS SEASONS--------------------
-taylor.diagram(oisst_season[["Hiver"]],glorys_season[["Hiver"]], "", pch = season_pch[["Hiver"]], 
-               col = season_colors[["Hiver"]], pcex=2, tcex=1.2, pos.cor=TRUE)
-
-for(season in seasons[-1]) {
-  taylor.diagram(oisst_season[[season]], glorys_season[[season]],
-                 "", col = season_colors[[season]], pch = season_pch[[season]],
-                 pcex = 2 , tcex = 1.2, pos.cor = TRUE, labpos = 1, add = TRUE)
-}
-legend(1.2,1.8, legend = seasons, col = season_colors, pch = season_pch, pt.cex = 1.5, cex = 1.2, bty = "n")
-
-#-----------------PLOT GLORYS SPA--------------------
-taylor.diagram(oisst_west,glorys_west, "", col="peru", pch=15,pcex=2, tcex=1.2,
-               pos.cor=TRUE)
-
-taylor.diagram(oisst_center,glorys_center, "", pch = 16, col="magenta3", pcex=2, tcex=1.2,
-               pos.cor=TRUE, labpos = 1, add=TRUE)
-
-taylor.diagram(oisst_east, glorys_east, "", col="turquoise3", pch = 17, pcex=2, tcex=1.2,
-               pos.cor=TRUE, labpos = 1, add=TRUE)
-
-legend(1.2,1.8,legend = c("West", "Center", "East"), col = c("peru", "magenta3", "turquoise3"), pch = c(16:18), pt.cex = 1.5, cex = 1.2, bty = "n")
-
-
-#-----------------PLOT BRAN YEARS--------------------
-taylor.diagram(oisst_years[["1993"]],bran_years[["1993"]], "", col="grey40", pcex=1, tcex=1.2,
-               pos.cor=TRUE)
-
-for(year in years[2:29]) {
-  year = as.character(year)
-  taylor.diagram(oisst_years[[year]],bran_years[[year]], "", col="grey40", pcex=1, tcex=1.2,
-                 pos.cor=TRUE, labpos = 1, add=TRUE)
-}
-taylor.diagram(oisst, bran, "", col="red", pcex=2, tcex=1.2,
-               pos.cor=TRUE, labpos = 1, add=TRUE)
-
-#-----------------PLOT BRAN SEASONS--------------------
-taylor.diagram(oisst_season[["Hiver"]],bran_season[["Hiver"]], "", pch=15, col="navy", pcex=2, tcex=1.2,
-               pos.cor=TRUE)
-
-for(season in seasons) {
-  taylor.diagram(oisst_season[[season]],bran_season[[season]], "",col = season_colors[[season]], pch = season_pch[[season]], 
-                 pcex=2, tcex=1.2, pos.cor=TRUE, labpos = 1, add=TRUE)
+# Fonction de tracé Taylor pour années
+plot_taylor_years <- function(obs_years, mod_years, mod_label) {
+  years_range <- names(obs_years)
+  taylor.diagram(obs_years[[years_range[1]]], mod_years[[years_range[1]]],
+                 "", col="grey40", pcex=1, tcex=1.2, pos.cor=TRUE)
+  for (yr in years_range[-1]) {
+    taylor.diagram(obs_years[[yr]], mod_years[[yr]], "", col="grey40", pcex=1,
+                   tcex=1.2, pos.cor=TRUE, labpos=1, add=TRUE)
+  }
+  taylor.diagram(unlist(obs_years), unlist(mod_years), "", col="red", pcex=2, tcex=1.2,
+                 pos.cor=TRUE, labpos=1, add=TRUE)
+  if (mod_label=="GLORYS") legend(1, 1.8, legend = c("Year (1993 - 2021)", "All Years Combined"),col = c("grey", "red"), bty = "n", pch = c(19, 19), pt.cex = 1.5, cex = 1.2)
 }
 
-#-----------------PLOT BRAN SPA--------------------
-taylor.diagram(oisst_west,bran_west, "", col="peru", pch=15, pcex=2, tcex=1.2,
-               pos.cor=TRUE)
-
-taylor.diagram(oisst_center,bran_center, "", col="magenta3", pch=16, pcex=2, tcex=1.2,
-               pos.cor=TRUE, labpos = 1, add=TRUE)
-
-taylor.diagram(oisst_east, bran_east, "", col="turquoise3", pch=17, pcex=2, tcex=1.2,
-               pos.cor=TRUE, labpos = 1, add=TRUE)
-
-
-#-----------------PLOT HYCOM YEARS--------------------
-taylor.diagram(oisst_years[["1994"]],hycom_years[["1994"]], "", col="grey40", pcex=1, tcex=1.2,
-               pos.cor=TRUE)
-
-for(year in years[3:22]) {
-  year = as.character(year)
-  taylor.diagram(oisst_years[[year]],hycom_years[[year]], "", col="grey40", pcex=1, tcex=1.2,
-                 pos.cor=TRUE, labpos = 1, add=TRUE)
-}
-taylor.diagram(oisst[13:276], hycom, "", col="red", pcex=2, tcex=1.2,
-               pos.cor=TRUE, labpos = 1, add=TRUE)
-
-#-----------------PLOT HYCOM SEASONS--------------------
-taylor.diagram(oisst_season[["Hiver"]][4:69],hycom_season[["Hiver"]], "", pch=15, col="navy", pcex=2, tcex=1.2,
-               pos.cor=TRUE)
-
-for(season in seasons) {
-  taylor.diagram(oisst_season[[season]][4:69],hycom_season[[season]], "", col = season_colors[[season]], pch = season_pch[[season]],
-                 pcex=2, tcex=1.2, pos.cor=TRUE, labpos = 1, add=TRUE)
+# Fonction de tracé Taylor pour saisons
+plot_taylor_seasons <- function(obs_seasons, mod_seasons, mod_label) {
+  if (identical(mod_seasons, data_seasons$hycom)){
+    first <- seasons[1]
+    taylor.diagram(obs_seasons[[first]][4:69], mod_seasons[[first]], "",
+                   col = season_colors[first], pch = season_pch[first], pcex=2,
+                   tcex=1.2, pos.cor=TRUE)
+    for (s in seasons[-1]) {
+      taylor.diagram(obs_seasons[[s]][4:69], mod_seasons[[s]], "",
+                     col = season_colors[s], pch = season_pch[s],
+                     pcex=2, tcex=1.2, pos.cor=TRUE, labpos=1, add=TRUE)
+    }
+  }else {
+    first <- seasons[1]
+    taylor.diagram(obs_seasons[[first]], mod_seasons[[first]], "",
+                   col = season_colors[first], pch = season_pch[first], pcex=2,
+                   tcex=1.2, pos.cor=TRUE)
+    for (s in seasons[-1]) {
+      taylor.diagram(obs_seasons[[s]], mod_seasons[[s]], "",
+                     col = season_colors[s], pch = season_pch[s],
+                     pcex=2, tcex=1.2, pos.cor=TRUE, labpos=1, add=TRUE)
+    }
+  }
+  if (mod_label=="GLORYS") legend(1.2, 1.7, legend = seasons, col = season_colors, pch = season_pch,
+                                  pt.cex = 1.5, cex = 1.2, bty = "n")
 }
 
-#-----------------PLOT HYCOM SPA--------------------
-taylor.diagram(oisst_west[13:276],hycom_west, "", col="peru", pch=15, pcex=2, tcex=1.2,
-               pos.cor=TRUE)
+# Fonction de tracé Taylor pour spatial (west/center/east)
+plot_taylor_spatial <- function(obs_list, mod_list, mod_label) {
+  i=1
+  if (identical(mod_list, data_list[c("hycom_west", "hycom_center", "hycom_east")])){
+    
+    for (zone in c("west", "center", "east")) {
+      taylor.diagram(obs_list[[i]][13:276], mod_list[[i]], "", col = spatial_colors[zone],
+                     pch = spatial_pch[zone], pcex = 2, tcex = 1.2, pos.cor = TRUE,
+                     labpos = 1, add = zone != "west")
+      i=i+1
+    }
+    
+  }else {
+    for (zone in c("west", "center", "east")) {
+      taylor.diagram(obs_list[[i]], mod_list[[i]], "", col = spatial_colors[zone],
+                     pch = spatial_pch[zone], pcex = 2, tcex = 1.2, pos.cor = TRUE,
+                     labpos = 1, add = zone != "west")
+      i=i+1
+    }
+  }
+  if (mod_label=="GLORYS") legend(1.2, 1.8, legend = c("West", "Center", "East"),
+                                  col = spatial_colors, pch = spatial_pch, pt.cex = 1.5, cex = 1.2, bty = "n")
+}
 
-taylor.diagram(oisst_center[13:276],hycom_center, "", col="magenta3", pch=16, pcex=2, tcex=1.2,
-               pos.cor=TRUE, labpos = 1, add=TRUE)
+#---------------------PLOTS--------------------------
+x11(width = 22, height = 20)
+par(mfrow = c(3, 3), oma = c(0, 6, 0, 0))
 
-taylor.diagram(oisst_east[13:276], hycom_east, "", col="turquoise3", pch=17, pcex=2, tcex=1.2,
-               pos.cor=TRUE, labpos = 1, add=TRUE)
+# GLORYS
+plot_taylor_years(data_years$oisst, data_years$glorys, "GLORYS")
+plot_taylor_seasons(data_seasons$oisst, data_seasons$glorys, "GLORYS")
+plot_taylor_spatial(data_list[c("oisst_west", "oisst_center", "oisst_east")],
+                    data_list[c("glorys_west", "glorys_center", "glorys_east")],
+                    "GLORYS")
 
-mtext("GLORYS12v1", side = 2, outer = TRUE, line = 0, at = 0.85, cex = 1.2)
-mtext("BRAN2020", side = 2, outer = TRUE, line = 0, at = 0.52, cex = 1.2)
-mtext("HYCOM 3.1", side = 2, outer = TRUE, line = 0, at = 0.18, cex = 1.2)
+# BRAN
+plot_taylor_years(data_years$oisst, data_years$bran, "BRAN")
+plot_taylor_seasons(data_seasons$oisst, data_seasons$bran, "BRAN")
+plot_taylor_spatial(data_list[c("oisst_west", "oisst_center", "oisst_east")],
+                    data_list[c("bran_west", "bran_center", "bran_east")],
+                    "BRAN")
+
+# HYCOM
+plot_taylor_years(data_years$oisst[2:23], data_years$hycom, "HYCOM")
+plot_taylor_seasons(data_seasons$oisst, data_seasons$hycom, "HYCOM")
+plot_taylor_spatial(data_list[c("oisst_west", "oisst_center", "oisst_east")],
+                    data_list[c("hycom_west", "hycom_center", "hycom_east")],
+                    "HYCOM")
+
+mtext("GLORYS12v1", side = 2, outer = TRUE, line = 1, at = 0.85, cex = 1.2)
+mtext("BRAN2020", side = 2, outer = TRUE, line = 1, at = 0.52, cex = 1.2)
+mtext("HYCOM 3.1", side = 2, outer = TRUE, line = 1, at = 0.18, cex = 1.2)
+
+# Texte penché sur la gauche (rotation à 90°)
 
 
-dev.copy(jpeg,file="C:/Users/jdanielou/Desktop/plots_internship/plot/taylor.jpeg", width = 15.5, height = 10, units = "in", res = 300)
+dev.copy(png,file="C:/Users/jdanielou/Desktop/plots_internship/plot/plots_taylor/taylor.png", width = 15.5, height = 13, units = "in", res = 300)
 dev.off()
-
-
 
