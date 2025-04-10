@@ -43,17 +43,10 @@ for (r in regions) {
   plot_diff(time = time,
             x = glorys_list[[r]],
             y = oisst_list[[r]],
-            Title = paste0("Time-Series (", toupper(r), "), (1993-01 / 2021-12)"),
+            Title = paste0("Time-Series of OISST and GLORYS12v1 (1993-01 / 2021-12), (", toupper(r), ")"),
             Legend = c("SST GLORYS12v1", "SST OISST", "Difference (GLORYS - OISST)"))
   
-  dev.copy(png,file=paste0("C:/Users/jdanielou/Desktop/plots_internship/plot/ts_oisst_glorys_",r,".png"), width = 15.5, height = 10, units = "in", res = 300)
+  dev.copy(png,file=paste0("C:/Users/jdanielou/Desktop/plots_internship/plot/plots_glorys/ts_oisst_glorys_",r,".png"), width = 15.5, height = 10, units = "in", res = 300)
   dev.off()
 }
-
-
-
-
-
-
-
 
