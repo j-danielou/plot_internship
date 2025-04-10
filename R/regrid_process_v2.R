@@ -44,7 +44,12 @@ for (product in rea_products) {
   }
   
   # Regrid
-  regrid_product = regrid(object = data, grid = oisst, method = "bilinear")
+  regrid_product = try(regrid(object = data, grid = oisst, method = "bilinear"))
+  if(inherits(regrid_product, "try-error")) {
+    message(sprintf("Error processing %s", file_out))
+    file.remove(file_tmp) # we remove it, so at the end we rerun the errors only
+    next
+  }
   
   # Save
   write_ncdf(regrid_product, filename = file_out)
