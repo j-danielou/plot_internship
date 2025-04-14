@@ -193,9 +193,31 @@ plot_taylor_subregion = function(obs, mod_list, legend){
   }
 }
 
+
+# Fonction de tracé Taylor pour spatial subregions en fonction des saisons
+plot_taylor_subregion_season = function(obs, mod_list, legend){
+  
+  for (i in 1:length(mod_list)){
+    if (i==3){
+      taylor.diagram(obs[4:69], mod_list[[i]], "", col = spatial_colors[i],
+                     pch = spatial_pch[i], pcex = 2, tcex = 1.2, pos.cor = TRUE,
+                     labpos = 1, add = i!=1)
+      
+    } else{
+      taylor.diagram(obs, mod_list[[i]], "", col = spatial_colors[i],
+                     pch = spatial_pch[i], pcex = 2, tcex = 1.2, pos.cor = TRUE,
+                     labpos = 1, add = i!=1)
+      if (i == 1 && length(legend) > 1) legend(1.1, 1.6, legend = legend, ncol = 1, col = spatial_colors[1:length(mod_list)], pch = spatial_pch[1:length(mod_list)], pt.cex = 1.5, cex = 1.2, bty = "n")
+    }
+  }
+}
+
+
+
+
 #---------------------PLOTS--------------------------
 x11(width = 45, height = 20)
-par(mfrow = c(1, 3), oma = c(6, 0, 1, 1))
+par(mfrow = c(1, 3), oma = c(6, 1, 0, 1))
 
 # GLORYS
 plot_taylor_spatial(data_list[c("oisst_nw", "oisst_nc", "oisst_ne", "oisst_sw", "oisst_sc", "oisst_se")],
@@ -351,6 +373,227 @@ mtext("East Side", side = 3, outer = TRUE, line = 1, at = 0.81, cex = 1.2)
 dev.copy(png,file="C:/Users/jdanielou/Desktop/plots_internship/plot/plots_taylor/taylor_subregions_season_hycom.png", width = 20, height = 13, units = "in", res = 300)
 dev.off()
 
+
+
+x11(width = 29, height = 20)
+par(mfrow = c(2, 2), oma = c(3, 0, 3, 0))
+#--------------N-W / all seasons / All Models----------------
+#Ete
+plot_taylor_subregion_season(data_seasons$oisst_nw$Été, mod_list <- list(
+  glorys_nw = data_seasons[["glorys_nw"]][["Été"]],
+  bran_nw   = data_seasons[["bran_nw"]][["Été"]],
+  hycom_nw  = data_seasons[["hycom_nw"]][["Été"]] ), legend = c("GLORYS12v1", "BRAN2020", "HYCOM3.1"))
+
+#Automne
+plot_taylor_subregion_season(data_seasons$oisst_nw$Automne, mod_list <- list(
+  glorys_nw = data_seasons[["glorys_nw"]][["Automne"]],
+  bran_nw   = data_seasons[["bran_nw"]][["Automne"]],
+  hycom_nw  = data_seasons[["hycom_nw"]][["Automne"]] ), legend = c("GLORYS12v1", "BRAN2020", "HYCOM3.1"))
+
+#Hiver
+plot_taylor_subregion_season(data_seasons$oisst_nw$Hiver, mod_list <- list(
+  glorys_nw = data_seasons[["glorys_nw"]][["Hiver"]],
+  bran_nw   = data_seasons[["bran_nw"]][["Hiver"]],
+  hycom_nw  = data_seasons[["hycom_nw"]][["Hiver"]] ), legend = "")
+
+#Printemps
+plot_taylor_subregion_season(data_seasons$oisst_nw$Printemps, mod_list <- list(
+  glorys_nw = data_seasons[["glorys_nw"]][["Printemps"]],
+  bran_nw   = data_seasons[["bran_nw"]][["Printemps"]],
+  hycom_nw  = data_seasons[["hycom_nw"]][["Printemps"]] ), legend = "")
+
+mtext("Eté", side = 3, outer = TRUE, line = 0, at = 0.25, cex = 1.2)
+mtext("Automne", side = 3, outer = TRUE, line = 0, at = 0.77, cex = 1.2)
+mtext("Hiver", side = 1, outer = TRUE, line = 0, at = 0.25, cex = 1.2)
+mtext("Printemps", side = 1, outer = TRUE, line = 0, at = 0.77, cex = 1.2)
+
+dev.copy(png,file="C:/Users/jdanielou/Desktop/plots_internship/plot/plots_taylor/taylor_subregions_seasons_nw.png", width = 20, height = 19, units = "in", res = 300)
+dev.off()
+
+
+
+x11(width = 29, height = 20)
+par(mfrow = c(2, 2), oma = c(3, 0, 3, 0))
+#-------------- N-C / all seasons / All Models ----------------
+#Ete
+plot_taylor_subregion_season(data_seasons$oisst_nc$Été, mod_list <- list(
+  glorys_nc = data_seasons[["glorys_nc"]][["Été"]],
+  bran_nc   = data_seasons[["bran_nc"]][["Été"]],
+  hycom_nc  = data_seasons[["hycom_nc"]][["Été"]] ), legend = c("GLORYS12v1", "BRAN2020", "HYCOM3.1"))
+
+#Automne
+plot_taylor_subregion_season(data_seasons$oisst_nc$Automne, mod_list <- list(
+  glorys_nc = data_seasons[["glorys_nc"]][["Automne"]],
+  bran_nc   = data_seasons[["bran_nc"]][["Automne"]],
+  hycom_nc  = data_seasons[["hycom_nc"]][["Automne"]] ), legend = c("GLORYS12v1", "BRAN2020", "HYCOM3.1"))
+
+#Hiver
+plot_taylor_subregion_season(data_seasons$oisst_nc$Hiver, mod_list <- list(
+  glorys_nc = data_seasons[["glorys_nc"]][["Hiver"]],
+  bran_nc   = data_seasons[["bran_nc"]][["Hiver"]],
+  hycom_nc  = data_seasons[["hycom_nc"]][["Hiver"]] ), legend = "")
+
+#Printemps
+plot_taylor_subregion_season(data_seasons$oisst_nc$Printemps, mod_list <- list(
+  glorys_nc = data_seasons[["glorys_nc"]][["Printemps"]],
+  bran_nc   = data_seasons[["bran_nc"]][["Printemps"]],
+  hycom_nc  = data_seasons[["hycom_nc"]][["Printemps"]] ), legend = "")
+
+mtext("Eté", side = 3, outer = TRUE, line = 0, at = 0.25, cex = 1.2)
+mtext("Automne", side = 3, outer = TRUE, line = 0, at = 0.77, cex = 1.2)
+mtext("Hiver", side = 1, outer = TRUE, line = 0, at = 0.25, cex = 1.2)
+mtext("Printemps", side = 1, outer = TRUE, line = 0, at = 0.77, cex = 1.2)
+
+dev.copy(png,file="C:/Users/jdanielou/Desktop/plots_internship/plot/plots_taylor/taylor_subregions_seasons_nc.png", width = 20, height = 19, units = "in", res = 300)
+dev.off()
+
+
+
+x11(width = 29, height = 20)
+par(mfrow = c(2, 2), oma = c(3, 0, 3, 0))
+#-------------- N-E / all seasons / All Models ----------------
+#Ete
+plot_taylor_subregion_season(data_seasons$oisst_ne$Été, mod_list <- list(
+  glorys_ne = data_seasons[["glorys_ne"]][["Été"]],
+  bran_ne   = data_seasons[["bran_ne"]][["Été"]],
+  hycom_ne  = data_seasons[["hycom_ne"]][["Été"]] ), legend = c("GLORYS12v1", "BRAN2020", "HYCOM3.1"))
+
+#Automne
+plot_taylor_subregion_season(data_seasons$oisst_ne$Automne, mod_list <- list(
+  glorys_ne = data_seasons[["glorys_ne"]][["Automne"]],
+  bran_ne   = data_seasons[["bran_ne"]][["Automne"]],
+  hycom_ne  = data_seasons[["hycom_ne"]][["Automne"]] ), legend = c("GLORYS12v1", "BRAN2020", "HYCOM3.1"))
+
+#Hiver
+plot_taylor_subregion_season(data_seasons$oisst_ne$Hiver, mod_list <- list(
+  glorys_ne = data_seasons[["glorys_ne"]][["Hiver"]],
+  bran_ne   = data_seasons[["bran_ne"]][["Hiver"]],
+  hycom_ne  = data_seasons[["hycom_ne"]][["Hiver"]] ), legend = "")
+
+#Printemps
+plot_taylor_subregion_season(data_seasons$oisst_ne$Printemps, mod_list <- list(
+  glorys_ne = data_seasons[["glorys_ne"]][["Printemps"]],
+  bran_ne   = data_seasons[["bran_ne"]][["Printemps"]],
+  hycom_ne  = data_seasons[["hycom_ne"]][["Printemps"]] ), legend = "")
+
+mtext("Eté", side = 3, outer = TRUE, line = 0, at = 0.25, cex = 1.2)
+mtext("Automne", side = 3, outer = TRUE, line = 0, at = 0.77, cex = 1.2)
+mtext("Hiver", side = 1, outer = TRUE, line = 0, at = 0.25, cex = 1.2)
+mtext("Printemps", side = 1, outer = TRUE, line = 0, at = 0.77, cex = 1.2)
+
+dev.copy(png,file="C:/Users/jdanielou/Desktop/plots_internship/plot/plots_taylor/taylor_subregions_seasons_ne.png", width = 20, height = 19, units = "in", res = 300)
+dev.off()
+
+
+
+x11(width = 29, height = 20)
+par(mfrow = c(2, 2), oma = c(3, 0, 3, 0))
+#-------------- S-W / all seasons / All Models ----------------
+#Ete
+plot_taylor_subregion_season(data_seasons$oisst_sw$Été, mod_list <- list(
+  glorys_sw = data_seasons[["glorys_sw"]][["Été"]],
+  bran_sw   = data_seasons[["bran_sw"]][["Été"]],
+  hycom_sw  = data_seasons[["hycom_sw"]][["Été"]] ), legend = c("GLORYS12v1", "BRAN2020", "HYCOM3.1"))
+
+#Automne
+plot_taylor_subregion_season(data_seasons$oisst_sw$Automne, mod_list <- list(
+  glorys_sw = data_seasons[["glorys_sw"]][["Automne"]],
+  bran_sw   = data_seasons[["bran_sw"]][["Automne"]],
+  hycom_sw  = data_seasons[["hycom_sw"]][["Automne"]] ), legend = c("GLORYS12v1", "BRAN2020", "HYCOM3.1"))
+
+#Hiver
+plot_taylor_subregion_season(data_seasons$oisst_sw$Hiver, mod_list <- list(
+  glorys_sw = data_seasons[["glorys_sw"]][["Hiver"]],
+  bran_sw   = data_seasons[["bran_sw"]][["Hiver"]],
+  hycom_sw  = data_seasons[["hycom_sw"]][["Hiver"]] ), legend = "")
+
+#Printemps
+plot_taylor_subregion_season(data_seasons$oisst_sw$Printemps, mod_list <- list(
+  glorys_sw = data_seasons[["glorys_sw"]][["Printemps"]],
+  bran_sw   = data_seasons[["bran_sw"]][["Printemps"]],
+  hycom_sw  = data_seasons[["hycom_sw"]][["Printemps"]] ), legend = "")
+
+mtext("Eté", side = 3, outer = TRUE, line = 0, at = 0.25, cex = 1.2)
+mtext("Automne", side = 3, outer = TRUE, line = 0, at = 0.77, cex = 1.2)
+mtext("Hiver", side = 1, outer = TRUE, line = 0, at = 0.25, cex = 1.2)
+mtext("Printemps", side = 1, outer = TRUE, line = 0, at = 0.77, cex = 1.2)
+
+dev.copy(png,file="C:/Users/jdanielou/Desktop/plots_internship/plot/plots_taylor/taylor_subregions_seasons_sw.png", width = 20, height = 19, units = "in", res = 300)
+dev.off()
+
+
+
+x11(width = 29, height = 20)
+par(mfrow = c(2, 2), oma = c(3, 0, 3, 0))
+#-------------- S-C / all seasons / All Models ----------------
+#Ete
+plot_taylor_subregion_season(data_seasons$oisst_sc$Été, mod_list <- list(
+  glorys_sc = data_seasons[["glorys_sc"]][["Été"]],
+  bran_sc   = data_seasons[["bran_sc"]][["Été"]],
+  hycom_sc  = data_seasons[["hycom_sc"]][["Été"]] ), legend = c("GLORYS12v1", "BRAN2020", "HYCOM3.1"))
+
+#Automne
+plot_taylor_subregion_season(data_seasons$oisst_sc$Automne, mod_list <- list(
+  glorys_sc = data_seasons[["glorys_sc"]][["Automne"]],
+  bran_sc   = data_seasons[["bran_sc"]][["Automne"]],
+  hycom_sc  = data_seasons[["hycom_sc"]][["Automne"]] ), legend = c("GLORYS12v1", "BRAN2020", "HYCOM3.1"))
+
+#Hiver
+plot_taylor_subregion_season(data_seasons$oisst_sc$Hiver, mod_list <- list(
+  glorys_sc = data_seasons[["glorys_sc"]][["Hiver"]],
+  bran_sc   = data_seasons[["bran_sc"]][["Hiver"]],
+  hycom_sc  = data_seasons[["hycom_sc"]][["Hiver"]] ), legend = "")
+
+#Printemps
+plot_taylor_subregion_season(data_seasons$oisst_sc$Printemps, mod_list <- list(
+  glorys_sc = data_seasons[["glorys_sc"]][["Printemps"]],
+  bran_sc   = data_seasons[["bran_sc"]][["Printemps"]],
+  hycom_sc  = data_seasons[["hycom_sc"]][["Printemps"]] ), legend = "")
+
+mtext("Eté", side = 3, outer = TRUE, line = 0, at = 0.25, cex = 1.2)
+mtext("Automne", side = 3, outer = TRUE, line = 0, at = 0.77, cex = 1.2)
+mtext("Hiver", side = 1, outer = TRUE, line = 0, at = 0.25, cex = 1.2)
+mtext("Printemps", side = 1, outer = TRUE, line = 0, at = 0.77, cex = 1.2)
+
+dev.copy(png,file="C:/Users/jdanielou/Desktop/plots_internship/plot/plots_taylor/taylor_subregions_seasons_sc.png", width = 20, height = 19, units = "in", res = 300)
+dev.off()
+
+
+
+x11(width = 29, height = 20)
+par(mfrow = c(2, 2), oma = c(3, 0, 3, 0))
+#-------------- S-E / all seasons / All Models ----------------
+#Ete
+plot_taylor_subregion_season(data_seasons$oisst_se$Été, mod_list <- list(
+  glorys_se = data_seasons[["glorys_se"]][["Été"]],
+  bran_se   = data_seasons[["bran_se"]][["Été"]],
+  hycom_se  = data_seasons[["hycom_se"]][["Été"]] ), legend = c("GLORYS12v1", "BRAN2020", "HYCOM3.1"))
+
+#Automne
+plot_taylor_subregion_season(data_seasons$oisst_se$Automne, mod_list <- list(
+  glorys_se = data_seasons[["glorys_se"]][["Automne"]],
+  bran_se   = data_seasons[["bran_se"]][["Automne"]],
+  hycom_se  = data_seasons[["hycom_se"]][["Automne"]] ), legend = c("GLORYS12v1", "BRAN2020", "HYCOM3.1"))
+
+#Hiver
+plot_taylor_subregion_season(data_seasons$oisst_se$Hiver, mod_list <- list(
+  glorys_se = data_seasons[["glorys_se"]][["Hiver"]],
+  bran_se   = data_seasons[["bran_se"]][["Hiver"]],
+  hycom_se  = data_seasons[["hycom_se"]][["Hiver"]] ), legend = "")
+
+#Printemps
+plot_taylor_subregion_season(data_seasons$oisst_se$Printemps, mod_list <- list(
+  glorys_se = data_seasons[["glorys_se"]][["Printemps"]],
+  bran_se   = data_seasons[["bran_se"]][["Printemps"]],
+  hycom_se  = data_seasons[["hycom_se"]][["Printemps"]] ), legend = "")
+
+mtext("Eté", side = 3, outer = TRUE, line = 0, at = 0.25, cex = 1.2)
+mtext("Automne", side = 3, outer = TRUE, line = 0, at = 0.77, cex = 1.2)
+mtext("Hiver", side = 1, outer = TRUE, line = 0, at = 0.25, cex = 1.2)
+mtext("Printemps", side = 1, outer = TRUE, line = 0, at = 0.77, cex = 1.2)
+
+dev.copy(png,file="C:/Users/jdanielou/Desktop/plots_internship/plot/plots_taylor/taylor_subregions_seasons_se.png", width = 20, height = 19, units = "in", res = 300)
+dev.off()
 
 
 ##############################################
