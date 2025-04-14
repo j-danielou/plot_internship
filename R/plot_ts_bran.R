@@ -12,7 +12,7 @@ x11(width = 18, height = 12)
 plot_diff(time = time, x = bran, y = oisst, Title ="Time-Series of OISST and BRAN20 (1993-01 / 2021-12)", 
           Legend = c("SST BRAN2020", "SST OISST", "Difference (BRAN - OISST)"))
 
-dev.copy(png,file="C:/Users/jdanielou/Desktop/plots_internship/plot/ts_oisst_bran_mhw.png", width = 15.5, height = 10, units = "in", res = 300)
+dev.copy(png,file="C:/Users/jdanielou/Desktop/plots_internship/plot/plots_bran/ts_oisst_bran_mhw.png", width = 15.5, height = 10, units = "in", res = 300)
 dev.off()
 
 
