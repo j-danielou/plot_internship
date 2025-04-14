@@ -49,17 +49,57 @@ split_by_season <- function(ts, offset = 0) {
 
 # Split des séries temporelles par années et saisons
 data_years <- list(
-  oisst = split_by_year(data_list$oisst),
-  glorys = split_by_year(data_list$glorys),
-  bran = split_by_year(data_list$bran),
-  hycom = split_by_year(data_list$hycom, offset = 12)
+  oisst_nw = split_by_year(data_list$oisst_nw),
+  oisst_nc = split_by_year(data_list$oisst_nc),
+  oisst_ne = split_by_year(data_list$oisst_ne),
+  oisst_sw = split_by_year(data_list$oisst_sw),
+  oisst_sc = split_by_year(data_list$oisst_sc),
+  oisst_se = split_by_year(data_list$oisst_se),
+  glorys_nw = split_by_year(data_list$glorys_nw),
+  glorys_nc = split_by_year(data_list$glorys_nc),
+  glorys_ne = split_by_year(data_list$glorys_ne),
+  glorys_sw = split_by_year(data_list$glorys_sw),
+  glorys_sc = split_by_year(data_list$glorys_sc),
+  glorys_se = split_by_year(data_list$glorys_se),
+  bran_nw = split_by_year(data_list$bran_nw),
+  bran_nc = split_by_year(data_list$bran_nc),
+  bran_ne = split_by_year(data_list$bran_ne),
+  bran_sw = split_by_year(data_list$bran_sw),
+  bran_sc = split_by_year(data_list$bran_sc),
+  bran_se = split_by_year(data_list$bran_se),
+  hycom_nw = split_by_year(data_list$hycom_nw, offset = 12),
+  hycom_nc = split_by_year(data_list$hycom_nc, offset = 12),
+  hycom_ne = split_by_year(data_list$hycom_ne, offset = 12),
+  hycom_sw = split_by_year(data_list$hycom_sw, offset = 12),
+  hycom_sc = split_by_year(data_list$hycom_sc, offset = 12),
+  hycom_se = split_by_year(data_list$hycom_se, offset = 12) 
 )
 
 data_seasons <- list(
-  oisst = split_by_season(data_list$oisst),
-  glorys = split_by_season(data_list$glorys),
-  bran = split_by_season(data_list$bran),
-  hycom = split_by_season(data_list$hycom, offset = 12)
+  oisst_nw = split_by_season(data_list$oisst_nw),
+  oisst_nc = split_by_season(data_list$oisst_nc),
+  oisst_ne = split_by_season(data_list$oisst_ne),
+  oisst_sw = split_by_season(data_list$oisst_sw),
+  oisst_sc = split_by_season(data_list$oisst_sc),
+  oisst_se = split_by_season(data_list$oisst_se),
+  glorys_nw = split_by_season(data_list$glorys_nw),
+  glorys_nc = split_by_season(data_list$glorys_nc),
+  glorys_ne = split_by_season(data_list$glorys_ne),
+  glorys_sw = split_by_season(data_list$glorys_sw),
+  glorys_sc = split_by_season(data_list$glorys_sc),
+  glorys_se = split_by_season(data_list$glorys_se),
+  bran_nw = split_by_season(data_list$bran_nw),
+  bran_nc = split_by_season(data_list$bran_nc),
+  bran_ne = split_by_season(data_list$bran_ne),
+  bran_sw = split_by_season(data_list$bran_sw),
+  bran_sc = split_by_season(data_list$bran_sc),
+  bran_se = split_by_season(data_list$bran_se),
+  hycom_nw = split_by_season(data_list$hycom_nw, offset = 12),
+  hycom_nc = split_by_season(data_list$hycom_nc, offset = 12),
+  hycom_ne = split_by_season(data_list$hycom_ne, offset = 12),
+  hycom_sw = split_by_season(data_list$hycom_sw, offset = 12),
+  hycom_sc = split_by_season(data_list$hycom_sc, offset = 12),
+  hycom_se = split_by_season(data_list$hycom_se, offset = 12) 
 )
 
 # Paramètres de tracé
@@ -81,12 +121,12 @@ plot_taylor_years <- function(obs_years, mod_years, mod_label) {
   }
   taylor.diagram(unlist(obs_years), unlist(mod_years), "", col="red", pcex=2, tcex=1.2,
                  pos.cor=TRUE, labpos=1, add=TRUE)
-  if (mod_label=="GLORYS") legend(1, 1.8, legend = c("Year (1993 - 2021)", "All Years Combined"),col = c("grey", "red"), bty = "n", pch = c(19, 19), pt.cex = 1.5, cex = 1.2)
+  if (mod_label=="GLORYS") legend(1, 1.6, legend = c("Year (1993 - 2021)", "All Years Combined"),col = c("grey", "red"), bty = "n", pch = c(19, 19), pt.cex = 1.5, cex = 1.2)
 }
 
 # Fonction de tracé Taylor pour saisons
-plot_taylor_seasons <- function(obs_seasons, mod_seasons, mod_label) {
-  if (identical(mod_seasons, data_seasons$hycom)){
+plot_taylor_seasons <- function(obs_seasons, mod_seasons, mod_label, hycom = FALSE) {
+  if (hycom == TRUE){
     first <- seasons[1]
     taylor.diagram(obs_seasons[[first]][4:69], mod_seasons[[first]], "",
                    col = season_colors[first], pch = season_pch[first], pcex=2,
@@ -107,7 +147,7 @@ plot_taylor_seasons <- function(obs_seasons, mod_seasons, mod_label) {
                      pcex=2, tcex=1.2, pos.cor=TRUE, labpos=1, add=TRUE)
     }
   }
-  if (mod_label=="GLORYS") legend(1.2, 1.7, legend = seasons, col = season_colors, pch = season_pch,
+  if (mod_label=="GLORYS") legend(1.2, 1.6, legend = seasons, col = season_colors, pch = season_pch,
                                   pt.cex = 1.5, cex = 1.2, bty = "n")
 }
 
@@ -131,7 +171,7 @@ plot_taylor_spatial <- function(obs_list, mod_list, mod_label, legend) {
       i=i+1
     }
   }
-  if (mod_label=="GLORYS") legend(1.1, 1.8, legend = legend, ncol = 2,
+  if (mod_label=="GLORYS") legend(1.1, 1.5, legend = legend, ncol = 2,
                                   col = spatial_colors, pch = spatial_pch, pt.cex = 1.5, cex = 1.2, bty = "n")
 }
 
@@ -154,38 +194,29 @@ plot_taylor_subregion = function(obs, mod_list, legend){
 }
 
 #---------------------PLOTS--------------------------
-x11(width = 22, height = 20)
-par(mfrow = c(3, 3), oma = c(0, 6, 0, 0))
+x11(width = 45, height = 20)
+par(mfrow = c(1, 3), oma = c(6, 0, 1, 1))
 
 # GLORYS
-plot_taylor_years(data_years$oisst, data_years$glorys, "GLORYS")
-plot_taylor_seasons(data_seasons$oisst, data_seasons$glorys, "GLORYS")
 plot_taylor_spatial(data_list[c("oisst_nw", "oisst_nc", "oisst_ne", "oisst_sw", "oisst_sc", "oisst_se")],
                     data_list[c("glorys_nw", "glorys_nc", "glorys_ne", "glorys_sw", "glorys_sc", "glorys_se")],
                     "GLORYS",legend = c("N-W", "N-C", "N-E", "S-W", "S-C", "S-E"))
 
 # BRAN
-plot_taylor_years(data_years$oisst, data_years$bran, "BRAN")
-plot_taylor_seasons(data_seasons$oisst, data_seasons$bran, "BRAN")
 plot_taylor_spatial(data_list[c("oisst_nw", "oisst_nc", "oisst_ne", "oisst_sw", "oisst_sc", "oisst_se")],
                     data_list[c("bran_nw", "bran_nc", "bran_ne", "bran_sw", "bran_sc", "bran_se")],
                     "BRAN",legend = c("N-W", "N-C", "N-E", "S-W", "S-C", "S-E"))
 
 # HYCOM
-plot_taylor_years(data_years$oisst[2:23], data_years$hycom, "HYCOM")
-plot_taylor_seasons(data_seasons$oisst, data_seasons$hycom, "HYCOM")
 plot_taylor_spatial(data_list[c("oisst_nw", "oisst_nc", "oisst_ne", "oisst_sw", "oisst_sc", "oisst_se")],
                     data_list[c("hycom_nw", "hycom_nc", "hycom_ne", "hycom_sw", "hycom_sc", "hycom_se")],
                     "HYCOM",legend = c("N-W", "N-C", "N-E", "S-W", "S-C", "S-E"))
 
-mtext("GLORYS12v1", side = 2, outer = TRUE, line = 1, at = 0.85, cex = 1.2)
-mtext("BRAN2020", side = 2, outer = TRUE, line = 1, at = 0.52, cex = 1.2)
-mtext("HYCOM 3.1", side = 2, outer = TRUE, line = 1, at = 0.18, cex = 1.2)
+mtext("GLORYS12v1", side = 1, outer = TRUE, line = 1, at = 0.17, cex = 1.2)
+mtext("BRAN2020", side = 1, outer = TRUE, line = 1, at = 0.52, cex = 1.2)
+mtext("HYCOM 3.1", side = 1, outer = TRUE, line = 1, at = 0.85, cex = 1.2)
 
-# Texte penché sur la gauche (rotation à 90°)
-
-
-dev.copy(png,file="C:/Users/jdanielou/Desktop/plots_internship/plot/plots_taylor/taylor_subregions.png", width = 15.5, height = 13, units = "in", res = 300)
+dev.copy(png,file="C:/Users/jdanielou/Desktop/plots_internship/plot/plots_taylor/taylor_subregions.png", width = 30, height = 10, units = "in", res = 300)
 dev.off()
 
 
@@ -220,8 +251,205 @@ mtext("East Side", side = 3, outer = TRUE, line = 1, at = 0.81, cex = 1.2)
 dev.copy(png,file="C:/Users/jdanielou/Desktop/plots_internship/plot/plots_taylor/taylor_subregions.png", width = 20, height = 13, units = "in", res = 300)
 dev.off()
 
+################################################
+#############                      #############
+############# Subregions - Seasons #############
+#############                      #############
+################################################
+
+x11(width = 29, height = 20)
+par(mfrow = c(2, 3), oma = c(0, 6, 5, 0))
+#-------------GLORYS12v1---------------
+#N-W
+plot_taylor_seasons(data_seasons$oisst_nw, data_seasons$glorys_nw, "GLORYS")
+
+#N-C
+plot_taylor_seasons(data_seasons$oisst_nc, data_seasons$glorys_nc, "GLORYS")
+
+#N-E
+plot_taylor_seasons(data_seasons$oisst_ne, data_seasons$glorys_ne, "GLORYS")
+
+#S-W
+plot_taylor_seasons(data_seasons$oisst_sw, data_seasons$glorys_sw, "")
+
+#S-C
+plot_taylor_seasons(data_seasons$oisst_sc, data_seasons$glorys_sc, "")
+
+#S-E
+plot_taylor_seasons(data_seasons$oisst_se, data_seasons$glorys_se, "")
+
+mtext("North Side", side = 2, outer = TRUE, line = 1, at = 0.77, cex = 1.2)
+mtext("South Side", side = 2, outer = TRUE, line = 1, at = 0.25, cex = 1.2)
+mtext("West Side", side = 3, outer = TRUE, line = 1, at = 0.15, cex = 1.2)
+mtext("Center Side", side = 3, outer = TRUE, line = 1, at = 0.49, cex = 1.2)
+mtext("East Side", side = 3, outer = TRUE, line = 1, at = 0.81, cex = 1.2)
+
+dev.copy(png,file="C:/Users/jdanielou/Desktop/plots_internship/plot/plots_taylor/taylor_subregions_season_glorys.png", width = 20, height = 13, units = "in", res = 300)
+dev.off()
 
 
 
+x11(width = 29, height = 20)
+par(mfrow = c(2, 3), oma = c(0, 6, 5, 0))
+#-------------BRAN2020---------------
+#N-W
+plot_taylor_seasons(data_seasons$oisst_nw, data_seasons$bran_nw, "GLORYS")
 
+#N-C
+plot_taylor_seasons(data_seasons$oisst_nc, data_seasons$bran_nc, "GLORYS")
+
+#N-E
+plot_taylor_seasons(data_seasons$oisst_ne, data_seasons$bran_ne, "GLORYS")
+
+#S-W
+plot_taylor_seasons(data_seasons$oisst_sw, data_seasons$bran_sw, "")
+
+#S-C
+plot_taylor_seasons(data_seasons$oisst_sc, data_seasons$bran_sc, "")
+
+#S-E
+plot_taylor_seasons(data_seasons$oisst_se, data_seasons$bran_se, "")
+
+mtext("North Side", side = 2, outer = TRUE, line = 1, at = 0.77, cex = 1.2)
+mtext("South Side", side = 2, outer = TRUE, line = 1, at = 0.25, cex = 1.2)
+mtext("West Side", side = 3, outer = TRUE, line = 1, at = 0.15, cex = 1.2)
+mtext("Center Side", side = 3, outer = TRUE, line = 1, at = 0.49, cex = 1.2)
+mtext("East Side", side = 3, outer = TRUE, line = 1, at = 0.81, cex = 1.2)
+
+dev.copy(png,file="C:/Users/jdanielou/Desktop/plots_internship/plot/plots_taylor/taylor_subregions_season_bran.png", width = 20, height = 13, units = "in", res = 300)
+dev.off()
+
+
+
+x11(width = 29, height = 20)
+par(mfrow = c(2, 3), oma = c(0, 6, 5, 0))
+#-------------HYCOM3.1---------------
+#N-W
+plot_taylor_seasons(data_seasons$oisst_nw, data_seasons$hycom_nw, "GLORYS", hycom=TRUE)
+
+#N-C
+plot_taylor_seasons(data_seasons$oisst_nc, data_seasons$hycom_nc, "GLORYS",hycom=TRUE)
+
+#N-E
+plot_taylor_seasons(data_seasons$oisst_ne, data_seasons$hycom_ne, "GLORYS", hycom=TRUE)
+
+#S-W
+plot_taylor_seasons(data_seasons$oisst_sw, data_seasons$hycom_sw, "", hycom=TRUE)
+
+#S-C
+plot_taylor_seasons(data_seasons$oisst_sc, data_seasons$hycom_sc, "", hycom=TRUE)
+
+#S-E
+plot_taylor_seasons(data_seasons$oisst_se, data_seasons$hycom_se, "", hycom=TRUE)
+
+mtext("North Side", side = 2, outer = TRUE, line = 1, at = 0.77, cex = 1.2)
+mtext("South Side", side = 2, outer = TRUE, line = 1, at = 0.25, cex = 1.2)
+mtext("West Side", side = 3, outer = TRUE, line = 1, at = 0.15, cex = 1.2)
+mtext("Center Side", side = 3, outer = TRUE, line = 1, at = 0.49, cex = 1.2)
+mtext("East Side", side = 3, outer = TRUE, line = 1, at = 0.81, cex = 1.2)
+
+dev.copy(png,file="C:/Users/jdanielou/Desktop/plots_internship/plot/plots_taylor/taylor_subregions_season_hycom.png", width = 20, height = 13, units = "in", res = 300)
+dev.off()
+
+
+
+##############################################
+#############                    #############
+############# Subregions - Years #############
+#############                    #############
+##############################################
+
+x11(width = 29, height = 20)
+par(mfrow = c(2, 3), oma = c(0, 6, 5, 0))
+#-------------GLORYS12v1---------------
+#N-W
+plot_taylor_years(data_years$oisst_nw, data_years$glorys_nw, "GLORYS")
+
+#N-C
+plot_taylor_years(data_years$oisst_nc, data_years$glorys_nc, "GLORYS")
+
+#N-E
+plot_taylor_years(data_years$oisst_ne, data_years$glorys_ne, "GLORYS")
+
+#S-W
+plot_taylor_years(data_years$oisst_sw, data_years$glorys_sw, "")
+
+#S-C
+plot_taylor_years(data_years$oisst_sc, data_years$glorys_sc, "")
+
+#S-E
+plot_taylor_years(data_years$oisst_se, data_years$glorys_se, "")
+
+mtext("North Side", side = 2, outer = TRUE, line = 1, at = 0.77, cex = 1.2)
+mtext("South Side", side = 2, outer = TRUE, line = 1, at = 0.25, cex = 1.2)
+mtext("West Side", side = 3, outer = TRUE, line = 1, at = 0.15, cex = 1.2)
+mtext("Center Side", side = 3, outer = TRUE, line = 1, at = 0.49, cex = 1.2)
+mtext("East Side", side = 3, outer = TRUE, line = 1, at = 0.81, cex = 1.2)
+
+dev.copy(png,file="C:/Users/jdanielou/Desktop/plots_internship/plot/plots_taylor/taylor_subregions_years_glorys.png", width = 20, height = 13, units = "in", res = 300)
+dev.off()
+
+
+
+x11(width = 29, height = 20)
+par(mfrow = c(2, 3), oma = c(0, 6, 5, 0))
+#-------------BRAN2020---------------
+#N-W
+plot_taylor_years(data_years$oisst_nw, data_years$bran_nw, "GLORYS")
+
+#N-C
+plot_taylor_years(data_years$oisst_nc, data_years$bran_nc, "GLORYS")
+
+#N-E
+plot_taylor_years(data_years$oisst_ne, data_years$bran_ne, "GLORYS")
+
+#S-W
+plot_taylor_years(data_years$oisst_sw, data_years$bran_sw, "")
+
+#S-C
+plot_taylor_years(data_years$oisst_sc, data_years$bran_sc, "")
+
+#S-E
+plot_taylor_years(data_years$oisst_se, data_years$bran_se, "")
+
+mtext("North Side", side = 2, outer = TRUE, line = 1, at = 0.77, cex = 1.2)
+mtext("South Side", side = 2, outer = TRUE, line = 1, at = 0.25, cex = 1.2)
+mtext("West Side", side = 3, outer = TRUE, line = 1, at = 0.15, cex = 1.2)
+mtext("Center Side", side = 3, outer = TRUE, line = 1, at = 0.49, cex = 1.2)
+mtext("East Side", side = 3, outer = TRUE, line = 1, at = 0.81, cex = 1.2)
+
+dev.copy(png,file="C:/Users/jdanielou/Desktop/plots_internship/plot/plots_taylor/taylor_subregions_years_bran.png", width = 20, height = 13, units = "in", res = 300)
+dev.off()
+
+
+
+x11(width = 29, height = 20)
+par(mfrow = c(2, 3), oma = c(0, 6, 5, 0))
+#-------------HYCOM3.1---------------
+#N-W
+plot_taylor_years(data_years$oisst_nw[2:23], data_years$hycom_nw, "GLORYS")
+
+#N-C
+plot_taylor_years(data_years$oisst_nc[2:23], data_years$hycom_nc, "GLORYS")
+
+#N-E
+plot_taylor_years(data_years$oisst_ne[2:23], data_years$hycom_ne, "GLORYS")
+
+#S-W
+plot_taylor_years(data_years$oisst_sw[2:23], data_years$hycom_sw, "")
+
+#S-C
+plot_taylor_years(data_years$oisst_sc[2:23], data_years$hycom_sc, "")
+
+#S-E
+plot_taylor_years(data_years$oisst_se[2:23], data_years$hycom_se, "")
+
+mtext("North Side", side = 2, outer = TRUE, line = 1, at = 0.77, cex = 1.2)
+mtext("South Side", side = 2, outer = TRUE, line = 1, at = 0.25, cex = 1.2)
+mtext("West Side", side = 3, outer = TRUE, line = 1, at = 0.15, cex = 1.2)
+mtext("Center Side", side = 3, outer = TRUE, line = 1, at = 0.49, cex = 1.2)
+mtext("East Side", side = 3, outer = TRUE, line = 1, at = 0.81, cex = 1.2)
+
+dev.copy(png,file="C:/Users/jdanielou/Desktop/plots_internship/plot/plots_taylor/taylor_subregions_years_hycom.png", width = 20, height = 13, units = "in", res = 300)
+dev.off()
 
