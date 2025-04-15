@@ -1,0 +1,26 @@
+library(gts)
+library(ggplot2)
+library(dplyr)
+library(fileds)
+# Lecture des données
+obs = read_gts("Y:/reanalysis/regional/southpacific/oisst-v2.1/oisst-v2r1-southpacific-sst-monthly-198109-202203.nc")
+
+x11(width = 15, height = 10)
+plot(obs, main= "", xlim=c(127,293), ylim=c(-65,6))
+segments(x0 = 120, y0 = -60, x1 = 120, y1 = 5, lty = 1, col = "black",lwd = 3)
+segments(x0 = 120, y0 = -27.5, x1 = 300, y1 = -27.5, lty = 1, col = "black",lwd = 3)
+segments(x0 = 120, y0 = 5, x1 = 300, y1 = 5, lty = 1, col = "black",lwd = 3)
+segments(x0 = 120, y0 = -60, x1 = 300, y1 = -60, lty = 1, col = "black",lwd = 3)
+segments(x0 = 180, y0 = 5, x1 = 180, y1 = -60, lty = 1, col = "black",lwd = 3)
+segments(x0 = 240, y0 = 5, x1 = 240, y1 = -60, lty = 1, col = "black",lwd = 3)
+segments(x0 = 300, y0 = 5, x1 = 300, y1 = -60, lty = 1, col = "black",lwd = 3)
+text(165,0, labels = "N-W", cex = 2, font=2)
+text(210,0, labels = "N-C", cex = 2, font=2)
+text(255,0, labels = "N-E", cex = 2, font=2)
+text(150,-52, labels = "S-W", cex = 2, font=2)
+text(210,-52, labels = "S-C", cex = 2, font=2)
+text(270,-52, labels = "S-E", cex = 2, font=2)
+
+
+dev.copy(png,file="C:/Users/jdanielou/Desktop/plots_internship/plot/maps/map_regions.png", width = 12, height = 8, units = "in", res = 150)
+dev.off()
