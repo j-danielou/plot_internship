@@ -18,7 +18,7 @@ dev.off()
 
 #------------------ 6 zones -----------------
 # Définir les régions
-regions <- c("nw", "nc", "ne", "sw", "sc", "se")
+regions <- c("mhw", "nw", "nc", "ne", "sw", "sc", "se")
 
 # Fonctions de lecture
 read_ts <- function(dataset, region) {
@@ -45,9 +45,10 @@ for (r in regions) {
             y = oisst_list[[r]],
             Title = paste0("Time-Series of OISST and GLORYS12v1 (1993-01 / 2021-12), (", toupper(r), ")"),
             Legend = c("SST GLORYS12v1", "SST OISST", "Difference (GLORYS - OISST)"),
-            pos.leg = "topright")
+            pos.leg = "topright",
+            lwd = 1.6)
   
-  dev.copy(png,file=paste0("C:/Users/jdanielou/Desktop/plots_internship/plot/plots_glorys/ts_oisst_glorys_",r,".png"), width = 15, height = 9, units = "in", res = 150)
+  dev.copy(png,file=paste0("C:/Users/jdanielou/Desktop/plots_internship/plot/plots_glorys/ts_oisst_glorys_",r,".png"), width = 15.5, height = 9, units = "in", res = 150)
   
   dev.off()
 }
