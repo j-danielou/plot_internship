@@ -1,4 +1,4 @@
-plot_diff = function(time, x, y, col=c("blue", "red"), Title, Legend, ...) {
+plot_diff = function(time, x, y, col=c("blue", "red"), Title, Legend, pos.leg=NULL, ...) {
   matches <- regmatches(Title, gregexpr("[0-9]{4}", Title))[[1]]
   year1 <- as.numeric(matches[1])
   year2 <- as.numeric(matches[2])+1
@@ -11,17 +11,23 @@ plot_diff = function(time, x, y, col=c("blue", "red"), Title, Legend, ...) {
   plot(time, x, ylim=c(0.97, 1.03)*range(c(x, y)), type="l", 
        axes=FALSE, col=col[1], ...)
   title( paste(Title, "RMSE = ",round(sqrt(mean((y - x)^2, na.rm = TRUE)),3)), cex.main = 2, line = -2) 
-  legend("topright", legend = Legend,
-         col = c(col[1], col[2], "purple"), lwd = 2, bty = "n", lty = c(1, 1, 1), cex = 1.5)
+  if (is.null(pos.leg)){
+    legend(x=287, y= 30.1, legend = Legend,
+         col = c(col[1], col[2], "purple"), lwd = 2, bty = "n", lty = c(1, 1, 1), cex = 1.4,y.intersp = 1.1)
+  }else{
+    legend(pos.leg, legend = Legend,
+           col = c(col[1], col[2], "purple"), lwd = 2, bty = "n", lty = c(1, 1, 1), cex = 1.4,y.intersp = 1.1)
+    }
   lines(time, y, col=col[2], ...)
   axis(2, las=1)
   box()
-  ylim = 1.05*c(-1, 1)*max(abs(dif))
+  ylim = c(-1.5,1.5)
   plot(time, dif, type="h", axes=FALSE,col="purple", ylim=ylim)
   abline(h=0, lty=3)
   axis(4, las=1)
   axis(1, at = seq(1, length(time), length.out = 10),  
        labels = round(seq(year1, year2, length.out = 10)), las = 1, cex.axis = 1)
   box()
-  return(invisible(NULL))
+  return(invisible((NULL)))
 }
+

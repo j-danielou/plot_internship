@@ -9,10 +9,10 @@ glorys = glorys$V1
 time = 1:length(glorys)
 
 x11(width = 18, height = 12)
-plot_diff(time = time, x = glorys, y = oisst, Title ="Time-Series of OISST and GLORYS12v1 (1993-01 / 2021-12)", 
+plot_diff(time = time, x = glorys, y = oisst, Title ="Time-Series of OISST and GLORYS12v1 (1993-01 / 2021-12),", 
           Legend = c("SST GLORYS12v1", "SST OISST", "Difference (GLORYS - OISST)"))
 
-dev.copy(png,file="C:/Users/jdanielou/Desktop/plots_internship/plot/plots_glorys/ts_oisst_glorys_mhw.png", width = 15.5, height = 10, units = "in", res = 300)
+dev.copy(png,file="C:/Users/jdanielou/Desktop/plots_internship/plot/plots_glorys/ts_oisst_glorys_mhw.png", width = 15, height = 9, units = "in", res = 150)
 dev.off()
 
 
@@ -44,9 +44,11 @@ for (r in regions) {
             x = glorys_list[[r]],
             y = oisst_list[[r]],
             Title = paste0("Time-Series of OISST and GLORYS12v1 (1993-01 / 2021-12), (", toupper(r), ")"),
-            Legend = c("SST GLORYS12v1", "SST OISST", "Difference (GLORYS - OISST)"))
+            Legend = c("SST GLORYS12v1", "SST OISST", "Difference (GLORYS - OISST)"),
+            pos.leg = "topright")
   
-  dev.copy(png,file=paste0("C:/Users/jdanielou/Desktop/plots_internship/plot/plots_glorys/ts_oisst_glorys_",r,".png"), width = 15.5, height = 10, units = "in", res = 300)
+  dev.copy(png,file=paste0("C:/Users/jdanielou/Desktop/plots_internship/plot/plots_glorys/ts_oisst_glorys_",r,".png"), width = 15, height = 9, units = "in", res = 150)
+  
   dev.off()
 }
 
