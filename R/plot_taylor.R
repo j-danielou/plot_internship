@@ -2,38 +2,38 @@
 source("R./function_taylor.R")
 
 # Définir les chemins de base
-base_path <- "C:/Users/jdanielou/Desktop/plot_internship/ts_csv"
-products <- c("oisst", "hycom", "bran", "glorys")
-zones <- c("", "west", "center", "east")
+base_path = "C:/Users/jdanielou/Desktop/plot_internship/ts_csv"
+products = c("oisst", "hycom", "bran", "glorys")
+zones = c("", "west", "center", "east")
 
 # Fonction pour charger les fichiers et extraire la colonne V1
-load_data <- function(product, zone = "") {
-  suffix <- if (zone == "") product else paste0(product, "_", zone)
-  file_path <- file.path(base_path, product, paste0(suffix, ".csv"))
+load_data = function(product, zone = "") {
+  suffix = if (zone == "") product else paste0(product, "_", zone)
+  file_path = file.path(base_path, product, paste0(suffix, ".csv"))
   read.table(file_path)$V1
 }
 
 # Charger toutes les données dans une liste nommée
-data_list <- list()
+data_list = list()
 for (prod in products) {
   for (zone in zones) {
-    name <- if (zone == "") prod else paste0(prod, "_", zone)
-    data_list[[name]] <- load_data(prod, zone)
+    name = if (zone == "") prod else paste0(prod, "_", zone)
+    data_list[[name]] = load_data(prod, zone)
   }
 }
 
 # Création des années/mois
-dates <- seq(as.Date("1993-01-01"), by = "month", length.out = length(data_list$oisst))
-years <- format(dates, "%Y")
-months <- as.numeric(format(dates, "%m"))
+dates = seq(as.Date("1993-01-01"), by = "month", length.out = length(data_list$oisst))
+years = format(dates, "%Y")
+months = as.numeric(format(dates, "%m"))
 
 # Fonction de découpe par année
-split_by_year <- function(ts, offset = 0) {
+split_by_year = function(ts, offset = 0) {
   split(ts, as.numeric(years)[(1 + offset):(length(ts) + offset)])
 }
 
 # Fonction d'attribution de saison (hémisphère sud)
-get_south_season <- function(month) {
+get_south_season = function(month) {
   switch(as.character(month),
          "12" = "Été", "1" = "Été", "2" = "Été",
          "3" = "Automne", "4" = "Automne", "5" = "Automne",
@@ -42,20 +42,20 @@ get_south_season <- function(month) {
 }
 
 # Regrouper les données par saison
-seasons_vec <- sapply(months, get_south_season)
-split_by_season <- function(ts, offset = 0) {
+seasons_vec = sapply(months, get_south_season)
+split_by_season = function(ts, offset = 0) {
   split(ts, seasons_vec[(1 + offset):(length(ts) + offset)])
 }
 
 # Split des séries temporelles par années et saisons
-data_years <- list(
+data_years = list(
   oisst = split_by_year(data_list$oisst),
   glorys = split_by_year(data_list$glorys),
   bran = split_by_year(data_list$bran),
   hycom = split_by_year(data_list$hycom, offset = 12)
 )
 
-data_seasons <- list(
+data_seasons = list(
   oisst = split_by_season(data_list$oisst),
   glorys = split_by_season(data_list$glorys),
   bran = split_by_season(data_list$bran),
@@ -63,15 +63,15 @@ data_seasons <- list(
 )
 
 # Paramètres de tracé
-seasons <- c("Hiver", "Printemps", "Été", "Automne")
-season_colors <- c("Hiver" = "navy", "Printemps" = "forestgreen", "Été" = "darkorange", "Automne" = "firebrick")
-season_pch <- c("Hiver" = 15, "Printemps" = 16, "Été" = 17, "Automne" = 18)
-spatial_colors <- c("west" = "peru", "center" = "magenta3", "east" = "turquoise3")
-spatial_pch <- c("west" = 15, "center" = 16, "east" = 17)
+seasons = c("Hiver", "Printemps", "Été", "Automne")
+season_colors = c("Hiver" = "navy", "Printemps" = "forestgreen", "Été" = "darkorange", "Automne" = "firebrick")
+season_pch = c("Hiver" = 15, "Printemps" = 16, "Été" = 17, "Automne" = 18)
+spatial_colors = c("west" = "peru", "center" = "magenta3", "east" = "turquoise3")
+spatial_pch = c("west" = 15, "center" = 16, "east" = 17)
 
 # Fonction de tracé Taylor pour années
-plot_taylor_years <- function(obs_years, mod_years, mod_label) {
-  years_range <- names(obs_years)
+plot_taylor_years = function(obs_years, mod_years, mod_label) {
+  years_range = names(obs_years)
   taylor.diagram(obs_years[[years_range[1]]], mod_years[[years_range[1]]],
                  "", col="grey40", pcex=1, tcex=1.2, pos.cor=TRUE)
   for (yr in years_range[-1]) {
@@ -84,9 +84,9 @@ plot_taylor_years <- function(obs_years, mod_years, mod_label) {
 }
 
 # Fonction de tracé Taylor pour saisons
-plot_taylor_seasons <- function(obs_seasons, mod_seasons, mod_label) {
+plot_taylor_seasons = function(obs_seasons, mod_seasons, mod_label) {
   if (identical(mod_seasons, data_seasons$hycom)){
-    first <- seasons[1]
+    first = seasons[1]
     taylor.diagram(obs_seasons[[first]][4:69], mod_seasons[[first]], "",
                    col = season_colors[first], pch = season_pch[first], pcex=2,
                    tcex=1.2, pos.cor=TRUE)
@@ -96,7 +96,7 @@ plot_taylor_seasons <- function(obs_seasons, mod_seasons, mod_label) {
                      pcex=2, tcex=1.2, pos.cor=TRUE, labpos=1, add=TRUE)
     }
   }else {
-    first <- seasons[1]
+    first = seasons[1]
     taylor.diagram(obs_seasons[[first]], mod_seasons[[first]], "",
                    col = season_colors[first], pch = season_pch[first], pcex=2,
                    tcex=1.2, pos.cor=TRUE)
@@ -111,7 +111,7 @@ plot_taylor_seasons <- function(obs_seasons, mod_seasons, mod_label) {
 }
 
 # Fonction de tracé Taylor pour spatial (west/center/east)
-plot_taylor_spatial <- function(obs_list, mod_list, mod_label) {
+plot_taylor_spatial = function(obs_list, mod_list, mod_label) {
   i=1
   if (identical(mod_list, data_list[c("hycom_west", "hycom_center", "hycom_east")])){
     

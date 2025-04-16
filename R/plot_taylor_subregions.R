@@ -2,38 +2,38 @@
 source("R./function_taylor.R")
 
 # Définir les chemins de base
-base_path <- "C:/Users/jdanielou/Desktop/plot_internship/ts_csv"
-products <- c("oisst", "hycom", "bran", "glorys")
-zones <- c("", "nw", "nc", "ne", "sw", "sc", "se")
+base_path = "C:/Users/jdanielou/Desktop/plot_internship/ts_csv"
+products = c("oisst", "hycom", "bran", "glorys")
+zones = c("", "nw", "nc", "ne", "sw", "sc", "se")
 
 # Fonction pour charger les fichiers et extraire la colonne V1
-load_data <- function(product, zone = "") {
-  suffix <- if (zone == "") product else paste0(product, "_", zone)
-  file_path <- file.path(base_path, product, paste0(suffix, ".csv"))
+load_data = function(product, zone = "") {
+  suffix = if (zone == "") product else paste0(product, "_", zone)
+  file_path = file.path(base_path, product, paste0(suffix, ".csv"))
   read.table(file_path)$V1
 }
 
 # Charger toutes les données dans une liste nommée
-data_list <- list()
+data_list = list()
 for (prod in products) {
   for (zone in zones) {
-    name <- if (zone == "") prod else paste0(prod, "_", zone)
-    data_list[[name]] <- load_data(prod, zone)
+    name = if (zone == "") prod else paste0(prod, "_", zone)
+    data_list[[name]] = load_data(prod, zone)
   }
 }
 
 # Création des années/mois
-dates <- seq(as.Date("1993-01-01"), by = "month", length.out = length(data_list$oisst))
-years <- format(dates, "%Y")
-months <- as.numeric(format(dates, "%m"))
+dates = seq(as.Date("1993-01-01"), by = "month", length.out = length(data_list$oisst))
+years = format(dates, "%Y")
+months = as.numeric(format(dates, "%m"))
 
 # Fonction de découpe par année
-split_by_year <- function(ts, offset = 0) {
+split_by_year = function(ts, offset = 0) {
   split(ts, as.numeric(years)[(1 + offset):(length(ts) + offset)])
 }
 
 # Fonction d'attribution de saison (hémisphère sud)
-get_south_season <- function(month) {
+get_south_season = function(month) {
   switch(as.character(month),
          "12" = "Summer", "1" = "Summer", "2" = "Summer",
          "3" = "Autumn", "4" = "Autumn", "5" = "Autumn",
@@ -42,13 +42,13 @@ get_south_season <- function(month) {
 }
 
 # Regrouper les données par saison
-seasons_vec <- sapply(months, get_south_season)
-split_by_season <- function(ts, offset = 0) {
+seasons_vec = sapply(months, get_south_season)
+split_by_season = function(ts, offset = 0) {
   split(ts, seasons_vec[(1 + offset):(length(ts) + offset)])
 }
 
 # Split des séries temporelles par années et saisons
-data_years <- list(
+data_years = list(
   oisst_nw = split_by_year(data_list$oisst_nw),
   oisst_nc = split_by_year(data_list$oisst_nc),
   oisst_ne = split_by_year(data_list$oisst_ne),
@@ -75,7 +75,7 @@ data_years <- list(
   hycom_se = split_by_year(data_list$hycom_se, offset = 12) 
 )
 
-data_seasons <- list(
+data_seasons = list(
   oisst_nw = split_by_season(data_list$oisst_nw),
   oisst_nc = split_by_season(data_list$oisst_nc),
   oisst_ne = split_by_season(data_list$oisst_ne),
@@ -103,16 +103,16 @@ data_seasons <- list(
 )
 
 # Paramètres de tracé
-seasons <- c("Winter", "Spring", "Summer", "Autumn")
-season_colors <- c("Winter" = "navy", "Spring" = "forestgreen", "Summer" = "darkorange", "Autumn" = "firebrick")
-season_pch <- c("Winter" = 15, "Spring" = 16, "Summer" = 17, "Autumn" = 18)
-#spatial_colors <- c("nw" = "sienna3", "nc" = "orchid4", "ne" = "turquoise4", "sw" = "peru", "sc" = "magenta3", "se" = "turquoise3")
-spatial_colors <- c("nw" = "#E41A1C", "nc" = "#377EB8", "ne" = "#4DAF4A", "sw" = "#984EA3", "sc" = "#FF7F00", "se" = "#FFFF33")  
-spatial_pch <- c("nw" = 15, "nc" = 16, "ne" = 17, "sw" = 18, "sc" = 8, "se" = 4)
+seasons = c("Winter", "Spring", "Summer", "Autumn")
+season_colors = c("Winter" = "navy", "Spring" = "forestgreen", "Summer" = "darkorange", "Autumn" = "firebrick")
+season_pch = c("Winter" = 15, "Spring" = 16, "Summer" = 17, "Autumn" = 18)
+#spatial_colors = c("nw" = "sienna3", "nc" = "orchid4", "ne" = "turquoise4", "sw" = "peru", "sc" = "magenta3", "se" = "turquoise3")
+spatial_colors = c("nw" = "#E41A1C", "nc" = "#377EB8", "ne" = "#4DAF4A", "sw" = "#984EA3", "sc" = "#FF7F00", "se" = "#FFFF33")  
+spatial_pch = c("nw" = 15, "nc" = 16, "ne" = 17, "sw" = 18, "sc" = 8, "se" = 4)
 
 # Fonction de tracé Taylor pour années
-plot_taylor_years <- function(obs_years, mod_years, mod_label) {
-  years_range <- names(obs_years)
+plot_taylor_years = function(obs_years, mod_years, mod_label) {
+  years_range = names(obs_years)
   taylor.diagram(obs_years[[years_range[1]]], mod_years[[years_range[1]]],
                  "", col="grey40", pcex=0.8, tcex=1.2, pos.cor=TRUE)
   for (yr in years_range[-1]) {
@@ -126,9 +126,9 @@ plot_taylor_years <- function(obs_years, mod_years, mod_label) {
 }
 
 # Fonction de tracé Taylor pour saisons
-plot_taylor_seasons <- function(obs_seasons, mod_seasons, mod_label, hycom = FALSE) {
+plot_taylor_seasons = function(obs_seasons, mod_seasons, mod_label, hycom = FALSE) {
   if (hycom == TRUE){
-    first <- seasons[1]
+    first = seasons[1]
     taylor.diagram(obs_seasons[[first]][4:69], mod_seasons[[first]], "",
                    col = season_colors[first], pch = season_pch[first], pcex=1.3,
                    tcex=1.2, pos.cor=TRUE)
@@ -138,7 +138,7 @@ plot_taylor_seasons <- function(obs_seasons, mod_seasons, mod_label, hycom = FAL
                      pcex=1.3, tcex=1.2, pos.cor=TRUE, labpos=1, add=TRUE)
     }
   }else {
-    first <- seasons[1]
+    first = seasons[1]
     taylor.diagram(obs_seasons[[first]], mod_seasons[[first]], "",
                    col = season_colors[first], pch = season_pch[first], pcex=1.3,
                    tcex=1.2, pos.cor=TRUE)
@@ -153,7 +153,7 @@ plot_taylor_seasons <- function(obs_seasons, mod_seasons, mod_label, hycom = FAL
 }
 
 # Fonction de tracé Taylor pour spatial (west/center/east)
-plot_taylor_spatial <- function(obs_list, mod_list, mod_label, legend) {
+plot_taylor_spatial = function(obs_list, mod_list, mod_label, legend) {
   i=1
   if (identical(mod_list, data_list[c("hycom_nw", "hycom_nc", "hycom_ne", "hycom_sw", "hycom_sc", "hycom_se")])){
     
@@ -388,25 +388,25 @@ x11(width = 29, height = 20)
 par(mfrow = c(2, 2), oma = c(2, 0, 2, 0))
 #--------------N-W / all seasons / All Models----------------
 #Ete
-plot_taylor_subregion_season(data_seasons$oisst_nw$Summer, mod_list <- list(
+plot_taylor_subregion_season(data_seasons$oisst_nw$Summer, mod_list = list(
   glorys_nw = data_seasons[["glorys_nw"]][["Summer"]],
   bran_nw   = data_seasons[["bran_nw"]][["Summer"]],
   hycom_nw  = data_seasons[["hycom_nw"]][["Summer"]] ), legend = c(""))
 
 #Autumn
-plot_taylor_subregion_season(data_seasons$oisst_nw$Autumn, mod_list <- list(
+plot_taylor_subregion_season(data_seasons$oisst_nw$Autumn, mod_list = list(
   glorys_nw = data_seasons[["glorys_nw"]][["Autumn"]],
   bran_nw   = data_seasons[["bran_nw"]][["Autumn"]],
   hycom_nw  = data_seasons[["hycom_nw"]][["Autumn"]] ), legend = c("GLORYS12v1", "BRAN2020", "HYCOM3.1"))
 
 #Winter
-plot_taylor_subregion_season(data_seasons$oisst_nw$Winter, mod_list <- list(
+plot_taylor_subregion_season(data_seasons$oisst_nw$Winter, mod_list = list(
   glorys_nw = data_seasons[["glorys_nw"]][["Winter"]],
   bran_nw   = data_seasons[["bran_nw"]][["Winter"]],
   hycom_nw  = data_seasons[["hycom_nw"]][["Winter"]] ), legend = "")
 
 #Spring
-plot_taylor_subregion_season(data_seasons$oisst_nw$Spring, mod_list <- list(
+plot_taylor_subregion_season(data_seasons$oisst_nw$Spring, mod_list = list(
   glorys_nw = data_seasons[["glorys_nw"]][["Spring"]],
   bran_nw   = data_seasons[["bran_nw"]][["Spring"]],
   hycom_nw  = data_seasons[["hycom_nw"]][["Spring"]] ), legend = "")
@@ -425,25 +425,25 @@ x11(width = 29, height = 20)
 par(mfrow = c(2, 2), oma = c(2, 0, 2, 0))
 #-------------- N-C / all seasons / All Models ----------------
 #Ete
-plot_taylor_subregion_season(data_seasons$oisst_nc$Summer, mod_list <- list(
+plot_taylor_subregion_season(data_seasons$oisst_nc$Summer, mod_list = list(
   glorys_nc = data_seasons[["glorys_nc"]][["Summer"]],
   bran_nc   = data_seasons[["bran_nc"]][["Summer"]],
   hycom_nc  = data_seasons[["hycom_nc"]][["Summer"]] ), legend = c(""))
 
 #Autumn
-plot_taylor_subregion_season(data_seasons$oisst_nc$Autumn, mod_list <- list(
+plot_taylor_subregion_season(data_seasons$oisst_nc$Autumn, mod_list = list(
   glorys_nc = data_seasons[["glorys_nc"]][["Autumn"]],
   bran_nc   = data_seasons[["bran_nc"]][["Autumn"]],
   hycom_nc  = data_seasons[["hycom_nc"]][["Autumn"]] ), legend = c("GLORYS12v1", "BRAN2020", "HYCOM3.1"))
 
 #Winter
-plot_taylor_subregion_season(data_seasons$oisst_nc$Winter, mod_list <- list(
+plot_taylor_subregion_season(data_seasons$oisst_nc$Winter, mod_list = list(
   glorys_nc = data_seasons[["glorys_nc"]][["Winter"]],
   bran_nc   = data_seasons[["bran_nc"]][["Winter"]],
   hycom_nc  = data_seasons[["hycom_nc"]][["Winter"]] ), legend = "")
 
 #Spring
-plot_taylor_subregion_season(data_seasons$oisst_nc$Spring, mod_list <- list(
+plot_taylor_subregion_season(data_seasons$oisst_nc$Spring, mod_list = list(
   glorys_nc = data_seasons[["glorys_nc"]][["Spring"]],
   bran_nc   = data_seasons[["bran_nc"]][["Spring"]],
   hycom_nc  = data_seasons[["hycom_nc"]][["Spring"]] ), legend = "")
@@ -462,25 +462,25 @@ x11(width = 29, height = 20)
 par(mfrow = c(2, 2), oma = c(2, 0, 2, 0))
 #-------------- N-E / all seasons / All Models ----------------
 #Ete
-plot_taylor_subregion_season(data_seasons$oisst_ne$Summer, mod_list <- list(
+plot_taylor_subregion_season(data_seasons$oisst_ne$Summer, mod_list = list(
   glorys_ne = data_seasons[["glorys_ne"]][["Summer"]],
   bran_ne   = data_seasons[["bran_ne"]][["Summer"]],
   hycom_ne  = data_seasons[["hycom_ne"]][["Summer"]] ), legend = c(""))
 
 #Autumn
-plot_taylor_subregion_season(data_seasons$oisst_ne$Autumn, mod_list <- list(
+plot_taylor_subregion_season(data_seasons$oisst_ne$Autumn, mod_list = list(
   glorys_ne = data_seasons[["glorys_ne"]][["Autumn"]],
   bran_ne   = data_seasons[["bran_ne"]][["Autumn"]],
   hycom_ne  = data_seasons[["hycom_ne"]][["Autumn"]] ), legend = c("GLORYS12v1", "BRAN2020", "HYCOM3.1"))
 
 #Winter
-plot_taylor_subregion_season(data_seasons$oisst_ne$Winter, mod_list <- list(
+plot_taylor_subregion_season(data_seasons$oisst_ne$Winter, mod_list = list(
   glorys_ne = data_seasons[["glorys_ne"]][["Winter"]],
   bran_ne   = data_seasons[["bran_ne"]][["Winter"]],
   hycom_ne  = data_seasons[["hycom_ne"]][["Winter"]] ), legend = "")
 
 #Spring
-plot_taylor_subregion_season(data_seasons$oisst_ne$Spring, mod_list <- list(
+plot_taylor_subregion_season(data_seasons$oisst_ne$Spring, mod_list = list(
   glorys_ne = data_seasons[["glorys_ne"]][["Spring"]],
   bran_ne   = data_seasons[["bran_ne"]][["Spring"]],
   hycom_ne  = data_seasons[["hycom_ne"]][["Spring"]] ), legend = "")
@@ -499,25 +499,25 @@ x11(width = 29, height = 20)
 par(mfrow = c(2, 2), oma = c(2, 0, 2, 0))
 #-------------- S-W / all seasons / All Models ----------------
 #Ete
-plot_taylor_subregion_season(data_seasons$oisst_sw$Summer, mod_list <- list(
+plot_taylor_subregion_season(data_seasons$oisst_sw$Summer, mod_list = list(
   glorys_sw = data_seasons[["glorys_sw"]][["Summer"]],
   bran_sw   = data_seasons[["bran_sw"]][["Summer"]],
   hycom_sw  = data_seasons[["hycom_sw"]][["Summer"]] ), legend = "")
 
 #Autumn
-plot_taylor_subregion_season(data_seasons$oisst_sw$Autumn, mod_list <- list(
+plot_taylor_subregion_season(data_seasons$oisst_sw$Autumn, mod_list = list(
   glorys_sw = data_seasons[["glorys_sw"]][["Autumn"]],
   bran_sw   = data_seasons[["bran_sw"]][["Autumn"]],
   hycom_sw  = data_seasons[["hycom_sw"]][["Autumn"]] ), legend = c("GLORYS12v1", "BRAN2020", "HYCOM3.1"))
 
 #Winter
-plot_taylor_subregion_season(data_seasons$oisst_sw$Winter, mod_list <- list(
+plot_taylor_subregion_season(data_seasons$oisst_sw$Winter, mod_list = list(
   glorys_sw = data_seasons[["glorys_sw"]][["Winter"]],
   bran_sw   = data_seasons[["bran_sw"]][["Winter"]],
   hycom_sw  = data_seasons[["hycom_sw"]][["Winter"]] ), legend = "")
 
 #Spring
-plot_taylor_subregion_season(data_seasons$oisst_sw$Spring, mod_list <- list(
+plot_taylor_subregion_season(data_seasons$oisst_sw$Spring, mod_list = list(
   glorys_sw = data_seasons[["glorys_sw"]][["Spring"]],
   bran_sw   = data_seasons[["bran_sw"]][["Spring"]],
   hycom_sw  = data_seasons[["hycom_sw"]][["Spring"]] ), legend = "")
@@ -536,25 +536,25 @@ x11(width = 29, height = 20)
 par(mfrow = c(2, 2), oma = c(2, 0, 2, 0))
 #-------------- S-C / all seasons / All Models ----------------
 #Ete
-plot_taylor_subregion_season(data_seasons$oisst_sc$Summer, mod_list <- list(
+plot_taylor_subregion_season(data_seasons$oisst_sc$Summer, mod_list = list(
   glorys_sc = data_seasons[["glorys_sc"]][["Summer"]],
   bran_sc   = data_seasons[["bran_sc"]][["Summer"]],
   hycom_sc  = data_seasons[["hycom_sc"]][["Summer"]] ), legend = "")
 
 #Autumn
-plot_taylor_subregion_season(data_seasons$oisst_sc$Autumn, mod_list <- list(
+plot_taylor_subregion_season(data_seasons$oisst_sc$Autumn, mod_list = list(
   glorys_sc = data_seasons[["glorys_sc"]][["Autumn"]],
   bran_sc   = data_seasons[["bran_sc"]][["Autumn"]],
   hycom_sc  = data_seasons[["hycom_sc"]][["Autumn"]] ), legend = c("GLORYS12v1", "BRAN2020", "HYCOM3.1"))
 
 #Winter
-plot_taylor_subregion_season(data_seasons$oisst_sc$Winter, mod_list <- list(
+plot_taylor_subregion_season(data_seasons$oisst_sc$Winter, mod_list = list(
   glorys_sc = data_seasons[["glorys_sc"]][["Winter"]],
   bran_sc   = data_seasons[["bran_sc"]][["Winter"]],
   hycom_sc  = data_seasons[["hycom_sc"]][["Winter"]] ), legend = "")
 
 #Spring
-plot_taylor_subregion_season(data_seasons$oisst_sc$Spring, mod_list <- list(
+plot_taylor_subregion_season(data_seasons$oisst_sc$Spring, mod_list = list(
   glorys_sc = data_seasons[["glorys_sc"]][["Spring"]],
   bran_sc   = data_seasons[["bran_sc"]][["Spring"]],
   hycom_sc  = data_seasons[["hycom_sc"]][["Spring"]] ), legend = "")
@@ -573,25 +573,25 @@ x11(width = 29, height = 20)
 par(mfrow = c(2, 2), oma = c(2, 0, 2, 0))
 #-------------- S-E / all seasons / All Models ----------------
 #Ete
-plot_taylor_subregion_season(data_seasons$oisst_se$Summer, mod_list <- list(
+plot_taylor_subregion_season(data_seasons$oisst_se$Summer, mod_list = list(
   glorys_se = data_seasons[["glorys_se"]][["Summer"]],
   bran_se   = data_seasons[["bran_se"]][["Summer"]],
   hycom_se  = data_seasons[["hycom_se"]][["Summer"]] ), legend = "")
 
 #Autumn
-plot_taylor_subregion_season(data_seasons$oisst_se$Autumn, mod_list <- list(
+plot_taylor_subregion_season(data_seasons$oisst_se$Autumn, mod_list = list(
   glorys_se = data_seasons[["glorys_se"]][["Autumn"]],
   bran_se   = data_seasons[["bran_se"]][["Autumn"]],
   hycom_se  = data_seasons[["hycom_se"]][["Autumn"]] ), legend = c("GLORYS12v1", "BRAN2020", "HYCOM3.1"))
 
 #Winter
-plot_taylor_subregion_season(data_seasons$oisst_se$Winter, mod_list <- list(
+plot_taylor_subregion_season(data_seasons$oisst_se$Winter, mod_list = list(
   glorys_se = data_seasons[["glorys_se"]][["Winter"]],
   bran_se   = data_seasons[["bran_se"]][["Winter"]],
   hycom_se  = data_seasons[["hycom_se"]][["Winter"]] ), legend = "")
 
 #Spring
-plot_taylor_subregion_season(data_seasons$oisst_se$Spring, mod_list <- list(
+plot_taylor_subregion_season(data_seasons$oisst_se$Spring, mod_list = list(
   glorys_se = data_seasons[["glorys_se"]][["Spring"]],
   bran_se   = data_seasons[["bran_se"]][["Spring"]],
   hycom_se  = data_seasons[["hycom_se"]][["Spring"]] ), legend = "")

@@ -3,24 +3,24 @@ source("R/function_plot_ts.R")
 
 #------------------ 11 zones (subregions & El Niño zones) -----------------
 # Définir les régions
-regions <- c("mhw", "nw", "nc", "ne", "sw", "sc", "se", "zone_1.2", "zone_3", "zone_3.4", "zone_4")
+regions = c("mhw", "nw", "nc", "ne", "sw", "sc", "se", "zone_1.2", "zone_3", "zone_3.4", "zone_4")
 
 # Fonctions de lecture
-read_ts <- function(dataset, region) {
-  path <- paste0("C:/Users/jdanielou/Desktop/plot_internship/ts_csv/", dataset, "/", dataset, "_", region, ".csv")
-  ts <- read.table(file = path)$V1
+read_ts = function(dataset, region) {
+  path = paste0("C:/Users/jdanielou/Desktop/plot_internship/ts_csv/", dataset, "/", dataset, "_", region, ".csv")
+  ts = read.table(file = path)$V1
   return(ts)
 }
 
 # Lire tous les fichiers en liste nommée
-oisst_list <- lapply(regions, function(r) read_ts("oisst", r))
-names(oisst_list) <- regions
+oisst_list = lapply(regions, function(r) read_ts("oisst", r))
+names(oisst_list) = regions
 
-glorys_list <- lapply(regions, function(r) read_ts("glorys", r))
-names(glorys_list) <- regions
+glorys_list = lapply(regions, function(r) read_ts("glorys", r))
+names(glorys_list) = regions
 
 # Définir le temps (en supposant que toutes les séries ont la même longueur)
-time <- 1:length(glorys_list[[1]])
+time = 1:length(glorys_list[[1]])
 
 # Plot
 for (r in regions) {

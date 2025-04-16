@@ -1,7 +1,7 @@
 plot_diff = function(time, x, y, col=c("blue", "red"), Title, Legend, pos.leg=NULL, ...) {
-  matches <- regmatches(Title, gregexpr("[0-9]{4}", Title))[[1]]
-  year1 <- as.numeric(matches[1])
-  year2 <- as.numeric(matches[2])+1
+  matches = regmatches(Title, gregexpr("[0-9]{4}", Title))[[1]]
+  year1 = as.numeric(matches[1])
+  year2 = as.numeric(matches[2])+1
   
   dif = x - y
   opar = par(no.readonly = TRUE)
