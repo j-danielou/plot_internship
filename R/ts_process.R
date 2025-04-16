@@ -21,7 +21,6 @@ for (name in names(datasets)) {
 
 # === Définition des régions ===
 regions <- list(
-  mhw = list(lon = c(160, 280), lat = c(-7, 5)),
   nw = list(lon = c(120, 180), lat = c(-27.5, 5)),
   nc = list(lon = c(180, 240), lat = c(-27.5, 5)),
   ne = list(lon = c(240, 300), lat = c(-27.5, 5)),
@@ -31,7 +30,7 @@ regions <- list(
 )
 
 # === Répertoire de sortie ===
-output_base <- "C:/Users/jdanielou/Desktop/test/ts_csv"
+output_base <- "C:/Users/jdanielou/Desktop/plots_internship/ts_csv"
 
 # === Fonction de traitement et d’exportation ===
 process_and_export <- function(data, name) {
@@ -54,7 +53,7 @@ process_and_export <- function(data, name) {
               row.names = FALSE, col.names = FALSE)
   message("Mean El Niño Area perfomed succesfully for : ", name)
   # Subregions
-  for (region in setdiff(names(regions), "mhw")) {
+  for (region in names(regions)) {
     r <- regions[[region]]
     sub_data <- subset(data, lat = r$lat, lon = r$lon)
     
@@ -70,4 +69,34 @@ process_and_export <- function(data, name) {
 # === Boucle principale ===
 for (name in names(datasets)) {
   process_and_export(datasets[[name]], name)  # ex: "oisst" → "OISST"
+}
+
+
+#------------------Process for El Niño zones (1+2, 3, 3.4, 4)-------------------
+elnino = list(
+  zone_1.2 = list(lon = c(270, 280), lat = c(-10,0)),
+  zone_3 = list(lon = c(210, 270), lat = c(-5,5)),
+  zone_3.4 = list(lon = c(190, 240), lat = c(-5,5)),
+  zone_4= list(lon = c(160, 210), lat = c(-5,5))
+)
+
+
+process_elnino_area <- function(data, name) {
+  # Subregions El Niño
+  for (zone in names(elnino)) {
+    r <- elnino[[zone]]
+    sub_data <- subset(data, lat = r$lat, lon = r$lon)
+    
+    message("Mean subregions (", r, ") start for : ", name)
+    sub_mean <- mean(sub_data, by = "time")
+    
+    write.table(sub_mean, file = file.path(output_base, name, paste0(name, "_", zone, ".csv")),
+                row.names = FALSE, col.names = FALSE)
+    message("Mean subregions (", r, ") perfomed succesfully for : ", name)
+  }
+}
+
+# === Boucle principale ===
+for (name in names(datasets)) {
+  process_elnino_area(datasets[[name]], name)  # ex: "oisst" → "OISST"
 }
