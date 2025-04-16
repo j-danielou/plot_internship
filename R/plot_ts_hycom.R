@@ -1,25 +1,9 @@
 source("R/function_plot_ts.R")
 
-#------------------ El Niño Area ----------------
-oisst = read.table(file = "C:/Users/jdanielou/Desktop/plots_internship/ts_csv/oisst/oisst_mhw.csv")
-hycom = read.table(file = "C:/Users/jdanielou/Desktop/plots_internship/ts_csv/hycom/hycom_mhw.csv")
 
-oisst=oisst$V1
-oisst = oisst[13:276]
-hycom = hycom$V1
-time = 1:length(hycom)
-
-x11(width = 18, height = 12)
-plot_diff(time = time, x = hycom, y = oisst, Title ="Time-Series of OISST and HYCOM 3.1 (1994-01 / 2015-12)", 
-          Legend = c("SST HYCOM 3.1", "SST OISST", "Difference (HYCOM - OISST)"))
-
-dev.copy(png,file="C:/Users/jdanielou/Desktop/plots_internship/plot/plots_hycom/ts_oisst_hycom_mhw.png", width = 15.5, height = 10, units = "in", res = 300)
-dev.off()
-
-
-#------------------ 6 zones -----------------
+#------------------ 11 zones (subregions & El Niño zones) -----------------
 # Définir les régions
-regions <- c("mhw" ,"nw", "nc", "ne", "sw", "sc", "se")
+regions <- c("mhw" ,"nw", "nc", "ne", "sw", "sc", "se", "zone_1.2", "zone_3", "zone_3.4", "zone_4")
 
 # Fonctions de lecture
 read_ts <- function(dataset, region) {
@@ -46,7 +30,9 @@ for (r in regions) {
             x = hycom_list[[r]],
             y = oisst_list[[r]],
             Title = paste0("Time-Series of OISST and HYCOM 3.1 (1994-01 / 2015-12), (", toupper(r), ")"),
-            Legend = c("SST HYCOM 3.1", "SST OISST", "Difference (HYCOM - OISST)"))
+            Legend = c("SST HYCOM 3.1", "SST OISST", "Difference (HYCOM - OISST)"),
+            pos.leg = "topright",
+            lwd = 1.6)
   
   dev.copy(png,file=paste0("C:/Users/jdanielou/Desktop/plots_internship/plot/plots_hycom/ts_oisst_hycom_",r,".png"), width = 15.5, height = 9, units = "in", res = 150)
   dev.off()
