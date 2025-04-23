@@ -35,10 +35,10 @@ split_by_year = function(ts, offset = 0) {
 # Fonction d'attribution de saison (hémisphère sud)
 get_south_season = function(month) {
   switch(as.character(month),
-         "12" = "Summer", "1" = "Summer", "2" = "Summer",
-         "3" = "Autumn", "4" = "Autumn", "5" = "Autumn",
-         "6" = "Winter", "7" = "Winter", "8" = "Winter",
-         "9" = "Spring", "10" = "Spring", "11" = "Spring")
+         "1" = "Summer", "2" = "Summer", "3" = "Summer",
+         "4" = "Autumn", "5" = "Autumn", "6" = "Autumn",
+         "7" = "Winter", "8" = "Winter", "9" = "Winter",
+         "10" = "Spring", "11" = "Spring", "12" = "Spring")
 }
 
 # Regrouper les données par saison
