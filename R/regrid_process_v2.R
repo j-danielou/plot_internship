@@ -1,13 +1,14 @@
+library(devtools)
 library(gts)
 library(ncdf4)
 
-rea_products = c("glorys", "bran", "hycom")
-path = "Y:/reanalysis/regional/southpacific"
-file_obs = "Y:/reanalysis/regional/southpacific/oisst-v2.1/oisst-v2r1-southpacific-sst-monthly-198109-202203.nc"
+rea_products = c("glorys-v1", "bran-2020", "hycom-3.1")
+path = "C:/Users/jdanielou/Desktop/reanalysis/regional/southpacific"
+file_obs = "C:/Users/jdanielou/Desktop/reanalysis/regional/southpacific/oisst-v2.1/oisst-v2r1-southpacific-sst-monthly-198109-202203.nc"
 
 for (product in rea_products) {
   # file
-  file_rea = list.files(path = path, pattern = paste0(product, ".*sst"), recursive = TRUE, include.dirs = FALSE, full.names = TRUE)
+  file_rea = list.files(path = file.path(path,product), pattern =  ".*sst", recursive = TRUE, include.dirs = FALSE, full.names = TRUE)
   
   # path setting
   if (product != "hycom") {
@@ -44,7 +45,7 @@ for (product in rea_products) {
   }
   
   # Regrid
-  regrid_product = try(regrid(object = data, grid = oisst, method = "bilinear"))
+  regrid_product = try(regrid(object = data, grid = oisst, method = "nearest"))
   if(inherits(regrid_product, "try-error")) {
     message(sprintf("Error processing %s", file_out))
     file.remove(file_tmp) # we remove it, so at the end we rerun the errors only
