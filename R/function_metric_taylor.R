@@ -97,4 +97,4 @@ results_df = data.frame(
 head(results_df)
 
 # Export CSV
-write.csv(results_df, "C:/Users/jdanielou/Desktop/plot_internship/csv/metric_csv/taylor_metrics_pixel_glorys.csv", row.names = FALSE)
+write.csv(results_df, "C:/Users/jdanielou/Desktop/plot_internship/csv/metric_csv/glorys/taylor_metrics_pixel_glorys.csv", row.names = FALSE)
