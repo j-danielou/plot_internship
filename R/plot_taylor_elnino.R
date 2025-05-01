@@ -2,7 +2,7 @@
 source("R./function_taylor.R")
 
 # Définir les chemins de base
-base_path = "C:/Users/jdanielou/Desktop/plot_internship/ts_csv"
+base_path = "C:/Users/jdanielou/Desktop/plot_internship/csv/ts_csv"
 products = c("oisst", "hycom", "bran", "glorys")
 zones = c("zone_1.2", "zone_3", "zone_3.4", "zone_4")
 

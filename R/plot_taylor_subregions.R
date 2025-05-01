@@ -2,9 +2,9 @@
 source("R./function_taylor.R")
 
 # Définir les chemins de base
-base_path = "C:/Users/jdanielou/Desktop/plot_internship/ts_csv"
+base_path = "C:/Users/jdanielou/Desktop/plot_internship/csv/ts_csv"
 products = c("oisst", "hycom", "bran", "glorys")
-zones = c("", "nw", "nc", "ne", "sw", "sc", "se")
+zones = c("full", "nw", "nc", "ne", "sw", "sc", "se")
 
 # Fonction pour charger les fichiers et extraire la colonne V1
 load_data = function(product, zone = "") {
@@ -23,7 +23,7 @@ for (prod in products) {
 }
 
 # Création des années/mois
-dates = seq(as.Date("1993-01-01"), by = "month", length.out = length(data_list$oisst))
+dates = seq(as.Date("1993-01-01"), by = "month", length.out = length(data_list$oisst_full))
 years = format(dates, "%Y")
 months = as.numeric(format(dates, "%m"))
 

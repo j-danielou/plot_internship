@@ -175,12 +175,16 @@ taylor.diagram = function (ref, model, label, add = FALSE,
       S = (2 * (1 + R))/(sd.f + (1/sd.f))^2
     }
   }
+  crmsd = sqrt(sd.r^2 + sd.f^2 - 2 * sd.r * sd.f * R)
   points(sd.f * R, sd.f * sin(acos(R)), pch = pch, col = col, 
          cex = pcex)
   text(sd.f * R, sd.f * sin(acos(R)),  labels=label, 
        cex = tcex, pos=labpos, col=col) 
   if (!add) text(sd.r, 0,  labels=reflabel, cex = tcex, adj=c(-0.1,1.1)) 
   invisible(oldpar)
+  return(list(sd.f = sd.f, 
+              R = R, 
+              crmsd = crmsd))
 }
 
 
