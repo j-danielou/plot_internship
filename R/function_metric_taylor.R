@@ -7,15 +7,17 @@ source("R./function_taylor.R")
 # ------------------------------
 # Charger vos données
 
-model = nc_open("C:/Users/jdanielou/Desktop/reanalysis/regional/southpacific/regrid/hycom-3.1-southpacific-sst-monthly-199301-202112-regrid.nc")
+model = nc_open("C:/Users/jdanielou/Desktop/reanalysis/regional/southpacific/regrid/bran-2020-southpacific-sst-monthly-199301-202112-regrid.nc")
 model_data = ncvar_get(model, "sst")
+model_data = model_data[,41:320,]
 
 oisst = nc_open("C:/Users/jdanielou/Desktop/reanalysis/regional/southpacific/oisst-v2.1/oisst-v2r1-southpacific-sst-monthly-198109-202203.nc")
 OISST_data = ncvar_get(oisst, "sst")
-OISST_data = OISST_data[,,149:412]
+OISST_data = OISST_data[,41:320,137:484]
 
 lon = ncvar_get(oisst, 'lon')
 lat = ncvar_get(oisst, 'lat')
+lat = lat[41:320]
 
 # ------------------------------
 # Préparation
@@ -41,7 +43,7 @@ step = 0
 # ------------------------------
 # Boucle principale
 
-png("C:/Users/jdanielou/Desktop/plots_internship/plot/plots_taylor/taylor_pixel_glorys_2.png", width = 1200, height = 1200)
+png("C:/Users/jdanielou/Desktop/plots_internship/plot/plots_taylor/taylor_pixel_bran_2.png", width = 1200, height = 1200)
 par(mar = c(6, 6, 4, 4))
 
 for (i in 1:nlon) {
@@ -102,4 +104,4 @@ results_df = data.frame(
 head(results_df)
 
 # Export CSV
-write.csv(results_df, "C:/Users/jdanielou/Desktop/plot_internship/csv/metric_csv/hycom/taylor_metrics_pixel_hycom.csv", row.names = FALSE)
+write.csv(results_df, "C:/Users/jdanielou/Desktop/plot_internship/csv/metric_csv/glorys/taylor_metrics_pixel_bran_60.csv", row.names = FALSE)
