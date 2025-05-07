@@ -1,12 +1,46 @@
 library(cluster)
 library(ClusterR)
-library(ggplot2)
+library(dplyr)
 
-# Préparer les données
-results_df = read.csv("C:/Users/jdanielou/Desktop/plot_internship/csv/metric_csv/glorys/")
 
-clust_data = results_df %>%
-  select(crmsd) %>%
+glorys_df = read.csv("C:/Users/jdanielou/Desktop/plot_internship/csv/metric_csv/glorys/taylor_metrics_pixel_glorys.csv")
+bran_df = read.csv("C:/Users/jdanielou/Desktop/plot_internship/csv/metric_csv/bran/taylor_metrics_pixel_bran.csv")
+hycom_df = read.csv("C:/Users/jdanielou/Desktop/plot_internship/csv/metric_csv/hycom/taylor_metrics_pixel_hycom.csv")
+
+glorys_df = glorys_df %>%
+  rename(
+    glorys_crmsd = crmsd,
+    glorys_R = R,
+    glorys_sd = sd,
+    glorys_rmse = rmse
+  )
+
+bran_df = bran_df %>%
+  rename(
+    bran_crmsd = crmsd,
+    bran_R = R,
+    bran_sd = sd,
+    bran_rmse = rmse
+  )
+
+hycom_df = hycom_df %>%
+  rename(
+    hycom_crmsd = crmsd,
+    hycom_R = R,
+    hycom_sd = sd,
+    hycom_rmse = rmse
+  )
+
+df_all = glorys_df %>%
+  left_join(bran_df, by = c("lon", "lat")) %>%
+  left_join(hycom_df, by = c("lon", "lat"))
+
+
+clust_data = df_all %>%
+  mutate(
+    lon_scaled = scale(lon)
+  ) %>%
+  select(glorys_crmsd, glorys_R, glorys_sd,bran_crmsd, bran_R, bran_sd,hycom_crmsd, hycom_R, hycom_sd,lon_scaled) %>%
   as.matrix()
 
 # Calculer l'inertie pour k = 1 à 10
