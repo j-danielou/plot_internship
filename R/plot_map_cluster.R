@@ -92,6 +92,9 @@ reorder_and_plot_clusters = function(df_all, clust1_path, clust2_path, prefix, c
   
   
   # Carte
+  c2t = gts:::coord2text
+  cl = gts:::checkLongitude
+  
   x11(width = 16, height = 12)
   p = ggplot() +
     geom_polygon(data = map_data("world2"), aes(x = long, y = lat, group = group),
@@ -100,6 +103,8 @@ reorder_and_plot_clusters = function(df_all, clust1_path, clust2_path, prefix, c
                size = 1) +
     coord_fixed(xlim = range(df_all$lon), ylim = range(df_all$lat), expand = FALSE) +
     scale_color_manual(values = colors) +
+    scale_x_continuous(breaks = pretty(df_all$lon, n=6), labels = c2t(cl(pretty(df_all$lon, n=6)), "lon"), expand = c(0, 0))+
+    scale_y_continuous(breaks = pretty(df_all$lat, n=4), labels = c2t(pretty(df_all$lat, n=4), "lat"), expand = c(0,0))+
     labs(color = "Cluster", title = paste0("Clusters des pixels - ", prefix)) +
     guides(color = guide_legend(override.aes = list(size = 6))) + 
     theme_minimal() +
@@ -142,14 +147,13 @@ length(col) = 7
 
 result = reorder_and_plot_clusters(
   df_all = df_all,
-  clust1_path = "C:/Users/jdanielou/Desktop/clust_centroid_glorys.rds",
-  clust2_path = "C:/Users/jdanielou/Desktop/clust_centroid_2_glorys.rds",
-  prefix = "glorys",
+  clust1_path = "C:/Users/jdanielou/Desktop/clust_centroid_full.rds",
+  clust2_path = "C:/Users/jdanielou/Desktop/clust_centroid_2_full.rds",
+  prefix = "full",
   colors =  col #c("seagreen", "lightseagreen", "lightblue1", "khaki", "orange", "brown4", "grey10")
 )
 
-
-
+saveRDS(result$df, file ="C:/Users/jdanielou/Desktop/df_all.rds")
 
 
 
