@@ -9,13 +9,16 @@ source("R./function_taylor.R")
 
 model = nc_open("C:/Users/jdanielou/Desktop/reanalysis/regional/southpacific/regrid/hycom-3.1-southpacific-sst-monthly-199301-202112-regrid.nc")
 model_data = ncvar_get(model, "sst")
-model_data = model_data[,41:320,]
-
+model_data = model_data[1:684,41:320,]
+biais_model = readRDS("C:/Users/jdanielou/Desktop/biais_mean_hycom.rds")
+x11()
+image(model_data[,,1])
 oisst = nc_open("C:/Users/jdanielou/Desktop/reanalysis/regional/southpacific/oisst-v2.1/oisst-v2r1-southpacific-sst-monthly-198109-202203.nc")
 OISST_data = ncvar_get(oisst, "sst")
-OISST_data = OISST_data[,41:320,149:412]
+OISST_data = OISST_data[1:684,41:320,149:412]
 
 lon = ncvar_get(oisst, 'lon')
+lon = lon[1:684]
 lat = ncvar_get(oisst, 'lat')
 lat = lat[41:320]
 
@@ -32,6 +35,7 @@ sd_list = numeric(npoints)
 R_list = numeric(npoints)
 crmsd_list = numeric(npoints)
 rmse_list = numeric(npoints)
+biais_list = numeric(npoints)
 
 row_id = 1
 diagram_started = FALSE
@@ -51,12 +55,13 @@ for (i in 1:nlon) {
     
     model_ts = model_data[i, j, ]
     obs_ts = OISST_data[i, j, ]
-    
+
     # Initialiser les valeurs par défaut (NA)
     sd_value = NA
     R_value = NA
     crmsd_value = NA
     rmse_value = NA
+    biais_value = biais_model[i,j]
     
     # Vérifier qu'il y a suffisamment de données valides
     if (sum(!is.na(model_ts) & !is.na(obs_ts)) > 3) {
@@ -85,6 +90,7 @@ for (i in 1:nlon) {
     R_list[row_id] = R_value
     crmsd_list[row_id] = crmsd_value
     rmse_list[row_id] = rmse_value
+    biais_list[row_id] = biais_value
     
     row_id = row_id + 1
     
@@ -105,7 +111,8 @@ results_df = data.frame(
   sd = sd_list,
   R = R_list,
   crmsd = crmsd_list,
-  rmse = rmse_list
+  rmse = rmse_list,
+  biais = biais_list
 )
 
 head(results_df)
