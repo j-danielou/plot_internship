@@ -1,123 +1,213 @@
-# -----------------------------------------
-# package
+#---------------------
+#Packages & Sources
 library(dplyr)
 library(ggplot2)
-library(ClusterR)
-library(viridis)
-library(maps)
-# -----------------------------------------
-# Data loading
-world = map_data("world2")
+source("R./function_taylor.R")
+
+#---------------------
+#Function
+reorder_and_plot_clusters = function(df_all, clust1_path, clust2_path, prefix, colors = NULL) {
+  library(dplyr)
+  library(ggplot2)
+  source("R./function_taylor.R")
+  # Charger les clusters
+  clust1 = readRDS(clust1_path)
+  clust2 = readRDS(clust2_path)
+  
+  # Appliquer le 1er clustering
+  df_all$cluster = clust1$clusters
+  df_all$cluster_final = clust2$clusters[df_all$cluster]
+  
+  if (prefix=="full"){
+    # Charger les centroïdes
+    centroids_df = as.data.frame(clust2$centroids)[, 1:9]
+    colnames(centroids_df) = c("glorys_crmsd", "glorys_R", "glorys_sd", "bran_crmsd", "bran_R", "bran_sd", "hycom_crmsd", "hycom_R", "hycom_sd")
+    centroids_df$cluster = 1:nrow(centroids_df)
+    
+    # Distance à l'idéal
+    target = c(crmsd = 0, R = 1, sd = 1)
+    centroids_df$distance_to_target = sqrt(
+      (centroids_df[[1]] - target["crmsd"])^2 +
+        (centroids_df[[2]] - target["R"])^2 +
+        (centroids_df[[3]] - target["sd"])^2 +
+        (centroids_df[[4]] - target["crmsd"])^2 +
+        (centroids_df[[5]] - target["R"])^2 +
+        (centroids_df[[6]] - target["sd"])^2 +
+        (centroids_df[[7]] - target["crmsd"])^2 +
+        (centroids_df[[8]] - target["R"])^2 +
+        (centroids_df[[9]] - target["sd"])^2
+    )
+  }else{
+    # Charger les centroïdes
+    centroids_df = as.data.frame(clust2$centroids)[, 1:3]
+    colnames(centroids_df) = paste0(prefix, c("_crmsd", "_R", "_sd"))
+    centroids_df$cluster = 1:nrow(centroids_df)
+    
+    # Distance à l'idéal
+    target = c(crmsd = 0, R = 1, sd = 1)
+    centroids_df$distance_to_target = sqrt(
+      (centroids_df[[1]] - target["crmsd"])^2 +
+        (centroids_df[[2]] - target["R"])^2 +
+        (centroids_df[[3]] - target["sd"])^2
+    )
+  }
+  
+  # Réordonner
+  centroids_df = centroids_df |>
+    arrange(distance_to_target) |>
+    mutate(new_cluster = row_number())
+  
+  # Recode
+  recode_vector = centroids_df$new_cluster
+  names(recode_vector) = centroids_df$cluster
+  df_all$cluster_final_reordered = recode_vector[as.character(df_all$cluster_final)]
+  
+  # Couleurs
+  n_clust = nrow(centroids_df)
+  if (is.null(colors)) {
+    colors = RColorBrewer::brewer.pal(n = n_clust, name = "Set3")
+    length(colors) = n_clust
+  }
+  names(colors) = as.character(1:n_clust)
+  
+  if (prefix != "full"){
+    # Taylor Diagram
+    x11(width = 10, height = 10)
+    taylor.diagram(ref = c(1, 1.1), model = c(1, 0.9), label = "Ref", add = FALSE)
+    pch_set = 16
+    for (j in 1:n_clust) {
+      crmsd = centroids_df[[1]][j]
+      R = centroids_df[[2]][j]
+      sd = centroids_df[[3]][j]
+      x = sd * R
+      y = sd * sin(acos(R))
+      points(x, y, col = colors[as.character(j)], pch = pch_set, cex = 1.3)
+    }
+    legend("topright", legend = prefix, col = "black", pch = pch_set, pt.cex = 2)
+    legend("bottomright", legend = paste("Cluster", 1:n_clust),
+           col = colors, pch = pch_set, pt.cex = 2, title = "Cluster")
+    dev.copy(png, file = paste0("C:/Users/jdanielou/Desktop/taylor-diagram-cluster-",prefix,".png"), width = 10, height = 10, units = "in", res = 150)
+    dev.off()
+  }  
+  
+  
+  # Carte
+  x11(width = 16, height = 12)
+  p = ggplot() +
+    geom_polygon(data = map_data("world2"), aes(x = long, y = lat, group = group),
+                 fill = "grey90", color = "grey70") +
+    geom_point(data = df_all, aes(x = lon, y = lat, color = as.factor(cluster_final_reordered)),
+               size = 1) +
+    coord_fixed(xlim = range(df_all$lon), ylim = range(df_all$lat), expand = FALSE) +
+    scale_color_manual(values = colors) +
+    labs(color = "Cluster", title = paste0("Clusters des pixels - ", prefix)) +
+    guides(color = guide_legend(override.aes = list(size = 6))) + 
+    theme_minimal() +
+    theme(plot.title = element_text(hjust = 0.5, size = 18),
+          axis.title = element_blank())
+  
+  print(p)
+  dev.copy(png, file = paste0("C:/Users/jdanielou/Desktop/map-cluster-",prefix,".png"), width = 16, height = 12, units = "in", res = 150)
+  dev.off() 
+  #Sys.sleep(1)
+  
+  # Retourne les résultats utiles si besoin
+  return(list(df = df_all, centroids = centroids_df, colors = colors, clust1 = clust1))
+}
 
 glorys_df = read.csv("C:/Users/jdanielou/Desktop/plot_internship/csv/metric_csv/glorys/taylor_metrics_pixel_glorys.csv")
 bran_df = read.csv("C:/Users/jdanielou/Desktop/plot_internship/csv/metric_csv/bran/taylor_metrics_pixel_bran.csv")
 hycom_df = read.csv("C:/Users/jdanielou/Desktop/plot_internship/csv/metric_csv/hycom/taylor_metrics_pixel_hycom.csv")
 
-glorys_df = glorys_df %>%
-  rename(
-    glorys_crmsd = crmsd,
-    glorys_R = R,
-    glorys_sd = sd,
-    glorys_rmse = rmse
-  )
+# Renommage des colonnes
+glorys_df = glorys_df |>
+  rename(glorys_crmsd = crmsd, glorys_R = R, glorys_sd = sd, glorys_rmse = rmse, glorys_biais = biais)
 
-bran_df = bran_df %>%
-  rename(
-    bran_crmsd = crmsd,
-    bran_R = R,
-    bran_sd = sd,
-    bran_rmse = rmse
-  )
+bran_df = bran_df |>
+  rename(bran_crmsd = crmsd, bran_R = R, bran_sd = sd, bran_rmse = rmse, bran_biais = biais)
 
-hycom_df = hycom_df %>%
-  rename(
-    hycom_crmsd = crmsd,
-    hycom_R = R,
-    hycom_sd = sd,
-    hycom_rmse = rmse
-  )
+hycom_df = hycom_df |>
+  rename(hycom_crmsd = crmsd, hycom_R = R, hycom_sd = sd, hycom_rmse = rmse, hycom_biais = biais)
 
+# Merge des données
 df_all = glorys_df %>%
   left_join(bran_df, by = c("lon", "lat")) %>%
-  left_join(hycom_df, by = c("lon", "lat"))
+  left_join(hycom_df, by = c("lon", "lat")) %>%
+  filter(complete.cases(.))
 
-df_all = df_all[complete.cases(df_all), ]
-# Préparation pour le clustering
-df_all = df_all %>%
-  mutate(
-    lon_scaled = (lon - min(lon)) / (max(lon) - min(lon)),
-    lat_scaled = (lat - min(lat)) / (max(lat) - min(lat))
-  )
+col = colorful::divergencePalette(n=8, col=c("dodgerblue3", "firebrick4"), intensity=0.3)
+col[7] = "grey10"
+length(col) = 7
 
 
-clust_data = df_all %>%
-  select(glorys_crmsd, glorys_R, glorys_sd, 
-         bran_crmsd, bran_R, bran_sd, 
-         hycom_crmsd, hycom_R, hycom_sd,
-         lon_scaled,lat_scaled) %>%
-  as.matrix()
-
-clust_data_centroide = df_all %>%
-  select(glorys_crmsd, glorys_R, glorys_sd, 
-         bran_crmsd, bran_R, bran_sd, 
-         hycom_crmsd, hycom_R, hycom_sd) %>%
-  as.matrix()
+result = reorder_and_plot_clusters(
+  df_all = df_all,
+  clust1_path = "C:/Users/jdanielou/Desktop/clust_centroid_glorys.rds",
+  clust2_path = "C:/Users/jdanielou/Desktop/clust_centroid_2_glorys.rds",
+  prefix = "glorys",
+  colors =  col #c("seagreen", "lightseagreen", "lightblue1", "khaki", "orange", "brown4", "grey10")
+)
 
 
-# Clustering rapide avec ClusterR
 
-set.seed(123)  
-k = 11       # nombre de clusters
-clust = KMeans_rcpp(clust_data, clusters = k, num_init = 5, max_iters = 1000)
 
-# Ajouter les clusters au dataframe
-df_all$cluster = clust$clusters
 
-# -----------------------------------------
-# Cluster Map
+
+
+
+
+
+
+
+
+
+
+
+
+###########################
+#######   TEST   ##########
+###########################
+prefix="hycom"
+centroids_df = as.data.frame(result$clust1$centroids)[, 1:3]
+colnames(centroids_df) = paste0(prefix, c("_crmsd", "_R", "_sd"))
+centroids_df$cluster = 1:nrow(centroids_df)
+
+# Distance à l'idéal
+target = c(crmsd = 0, R = 1, sd = 1)
+centroids_df$distance_to_target = sqrt(
+  (centroids_df[[1]] - target["crmsd"])^2 +
+    (centroids_df[[2]] - target["R"])^2 +
+    (centroids_df[[3]] - target["sd"])^2
+)
+
+# Réordonner
+centroids_df = centroids_df |>
+  arrange(distance_to_target) |>
+  mutate(new_cluster = row_number())
+
+# Recode
+recode_vector = centroids_df$new_cluster
+names(recode_vector) = centroids_df$cluster
+
+
+col = colorful::divergencePalette(n=1000, col=c("dodgerblue3", "firebrick4"), intensity=0.2)
+result_df_all = result$df
+result_df_all$cluster_final_reordered = recode_vector[as.character(result_df_all$cluster)]
 x11(width = 16, height = 12)
 ggplot() +
-  geom_polygon(data = world, aes(x = long, y = lat, group = group),
+  geom_polygon(data = map_data("world2"), aes(x = long, y = lat, group = group),
                fill = "grey90", color = "grey70") +
-  geom_point(data = df_all, aes(x = lon, y = lat, color = as.factor(cluster)),
+  geom_point(data = result_df_all, aes(x = lon, y = lat, color = as.factor(cluster_final_reordered)),
              size = 1) +
-  coord_fixed(xlim = c(128, 292),
-              ylim = c(-57, 7)) +
-  scale_color_brewer(palette = "Set3") +
-  labs(color = "Cluster", title = "Clusters des pixels basés sur les performances du modèle") +
-  guides(color = guide_legend(override.aes = list(size = 6))) + 
+  coord_fixed(xlim = range(df_all$lon), ylim = range(df_all$lat), expand = FALSE) +
+  scale_color_manual(values = col) +
+  labs(color = "Cluster", title = paste0("Clusters des pixels - ")) +
   theme_minimal() +
-  theme(
-    plot.title = element_text(hjust = 0.5, size = 18),
-    axis.title = element_blank()
-  )
-dev.copy(png,"C:/Users/jdanielou/Desktop/plots_internship/plot/maps/cluster/hycom/clusters_map_hycom_full_k5.png", width = 1600, height = 1200, res = 150)
-dev.off()
+  theme(plot.title = element_text(hjust = 0.5, size = 18),
+        axis.title = element_blank(),
+        legend.position = "none")
 
 
-# Metric Map
-x11(width = 16, height = 12)
-ggplot() +
-  geom_polygon(data = world, aes(x = long, y = lat, group = group),
-               fill = "grey90", color = "grey70") +
-  geom_point(data = results_df, aes(x = lon, y = lat, color = R),
-             size = 1) +
-  coord_fixed(xlim = c(128, 292),
-              ylim = c(-57, 7)) +
-  scale_color_viridis(option = "viridis", name = "Corrélation R", limits = c(0.3, 1)) +
-  labs(title = "Corrélation (R) entre modèle et observations") +
-  theme_minimal() +
-  theme(
-    plot.title = element_text(hjust = 0.5, size = 18),
-    axis.title = element_blank()
-  )
 
-dev.copy(png,"C:/Users/jdanielou/Desktop/plots_internship/plot/maps/cluster/hycom/correlation_map_hycom.png", width = 1600, height = 1200, res = 150)
-dev.off()
-
-# -----------------------------------------
-# Save dataframe
-
-write.csv(results_df, "C:/Users/jdanielou/Desktop/plots_internship/csv/metric_csv/glorys/clusters_results_norm_k4.csv", row.names = FALSE)
 
 
