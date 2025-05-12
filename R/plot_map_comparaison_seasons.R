@@ -55,6 +55,7 @@ df_all = glorys |>
   left_join(hycom, by = c("lon", "lat"))|>
   left_join(hycom_bias, by = c("lon", "lat"))
 
+saveRDS(df_all, file = "C:/Users/jdanielou/Desktop/df_all_season.rds")
 # -----------------------------------------
 # function
 c2t = gts:::coord2text
