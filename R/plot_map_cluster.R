@@ -95,7 +95,7 @@ reorder_and_plot_clusters = function(df_all, clust1_path, clust2_path, prefix, c
   c2t = gts:::coord2text
   cl = gts:::checkLongitude
   
-  x11(width = 16, height = 12)
+  x11(width = 16, height = 8)
   p = ggplot() +
     geom_polygon(data = map_data("world2"), aes(x = long, y = lat, group = group),
                  fill = "grey90", color = "grey70") +
@@ -105,14 +105,16 @@ reorder_and_plot_clusters = function(df_all, clust1_path, clust2_path, prefix, c
     scale_color_manual(values = colors) +
     scale_x_continuous(breaks = pretty(df_all$lon, n=6), labels = c2t(cl(pretty(df_all$lon, n=6)), "lon"), expand = c(0, 0))+
     scale_y_continuous(breaks = pretty(df_all$lat, n=4), labels = c2t(pretty(df_all$lat, n=4), "lat"), expand = c(0,0))+
-    labs(color = "Cluster", title = paste0("Clusters des pixels - ", prefix)) +
+    labs(color = "Cluster", title = "") +
     guides(color = guide_legend(override.aes = list(size = 6))) + 
     theme_minimal() +
-    theme(plot.title = element_text(hjust = 0.5, size = 18),
-          axis.title = element_blank())
+    theme(plot.title = element_blank(),
+          axis.title = element_blank(),
+          axis.text.x = element_text(size = 10),
+          axis.text.y = element_text(size = 10))
   
   print(p)
-  dev.copy(png, file = paste0("C:/Users/jdanielou/Desktop/map-cluster-",prefix,".png"), width = 16, height = 12, units = "in", res = 150)
+  dev.copy(png, file = paste0("C:/Users/jdanielou/Desktop/map-cluster-",prefix,".png"), width = 16, height = 7, units = "in", res = 200)
   dev.off() 
   #Sys.sleep(1)
   
@@ -154,13 +156,6 @@ result = reorder_and_plot_clusters(
 )
 
 saveRDS(result$df, file ="C:/Users/jdanielou/Desktop/df_all.rds")
-
-
-
-
-
-
-
 
 
 
