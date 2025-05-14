@@ -71,6 +71,11 @@ reorder_and_plot_clusters = function(df_all, clust1_path, clust2_path, prefix, c
   names(colors) = as.character(1:n_clust)
   
   if (prefix != "full"){
+    col = colorful::divergencePalette(n=8, col=c("dodgerblue3", "firebrick4"), intensity=1)
+    col[7] = "grey10"
+    length(col) = 7
+    names(col) = as.character(1:n_clust)
+    
     # Taylor Diagram
     x11(width = 10, height = 10)
     taylor.diagram(ref = c(1, 1.1), model = c(1, 0.9), label = "Ref", add = FALSE)
@@ -81,15 +86,46 @@ reorder_and_plot_clusters = function(df_all, clust1_path, clust2_path, prefix, c
       sd = centroids_df[[3]][j]
       x = sd * R
       y = sd * sin(acos(R))
-      points(x, y, col = colors[as.character(j)], pch = pch_set, cex = 1.3)
+      points(x, y, col = col[as.character(j)], pch = pch_set, cex = 1.3)
     }
-    legend("topright", legend = prefix, col = "black", pch = pch_set, pt.cex = 2)
-    legend("bottomright", legend = paste("Cluster", 1:n_clust),
-           col = colors, pch = pch_set, pt.cex = 2, title = "Cluster")
+    legend("topright", legend = prefix,
+           col = "black", pch = pch_set, pt.cex = 2, inset = c(-0.05, -0.05))
+    legend("topright", legend = paste("Cluster", 1:n_clust),
+           col = col, pch = 15, pt.cex = 2, inset = c(-0.05, 0.08))
     dev.copy(png, file = paste0("C:/Users/jdanielou/Desktop/taylor-diagram-cluster-",prefix,".png"), width = 10, height = 10, units = "in", res = 150)
     dev.off()
-  }  
-  
+  }else{
+    col = colorful::divergencePalette(n=8, col=c("dodgerblue3", "firebrick4"), intensity=1)
+    col[7] = "grey10"
+    length(col) = 7
+    names(col) = as.character(1:n_clust)
+    
+    # Taylor Diagram
+    x11(width = 10, height = 10)
+    taylor.diagram(ref = c(1, 1.1), model = c(1, 0.9), label = "Ref", add = FALSE)
+    pch_set = c(16,17,18) 
+    # Boucle sur les 3 produits
+    for (i in 1:3) {
+      
+      # Sélectionner les colonnes appropriées
+      R_col = centroids_df[[ (i-1)*3 + 2 ]]
+      sd_col = centroids_df[[ (i-1)*3 + 3 ]]
+      
+      # Ajouter les points pour chaque cluster
+      for (j in 1:n_clust) {
+        
+        # Ajouter point
+        points(sd_col[j] * R_col[j], sd_col[j] * sin(acos(R_col[j])), col = col[as.character(j)], pch = pch_set[i], cex = 1.2)
+        
+      }
+    }
+    legend("topright", legend = c("GLORYS", "BRAN", "HYCOM"),
+           col = "black", pch = pch_set, pt.cex = 2, inset = c(-0.05, -0.05))
+    legend("topright", legend = paste("Cluster", 1:n_clust),
+           col = col, pch = 15, pt.cex = 2, inset = c(-0.05, 0.08))
+    dev.copy(png, file = paste0("C:/Users/jdanielou/Desktop/taylor-diagram-cluster-",prefix,".png"), width = 10, height = 10, units = "in", res = 150)
+    dev.off()
+  }
   
   # Carte
   c2t = gts:::coord2text
@@ -106,12 +142,13 @@ reorder_and_plot_clusters = function(df_all, clust1_path, clust2_path, prefix, c
     scale_x_continuous(breaks = pretty(df_all$lon, n=6), labels = c2t(cl(pretty(df_all$lon, n=6)), "lon"), expand = c(0, 0))+
     scale_y_continuous(breaks = pretty(df_all$lat, n=4), labels = c2t(pretty(df_all$lat, n=4), "lat"), expand = c(0,0))+
     labs(color = "Cluster", title = "") +
-    guides(color = guide_legend(override.aes = list(size = 6))) + 
+    guides(color = guide_legend(override.aes = list(size = 10), label.theme = element_text(size = 15),
+                                title.theme = element_text(size = 15))) + 
     theme_minimal() +
     theme(plot.title = element_blank(),
           axis.title = element_blank(),
-          axis.text.x = element_text(size = 10),
-          axis.text.y = element_text(size = 10))
+          axis.text.x = element_text(size = 15),
+          axis.text.y = element_text(size = 15))
   
   print(p)
   dev.copy(png, file = paste0("C:/Users/jdanielou/Desktop/map-cluster-",prefix,".png"), width = 16, height = 7, units = "in", res = 200)

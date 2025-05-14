@@ -84,8 +84,9 @@ plot_metric = function(df, variable, title = "", legend_title = "", limits, pale
     scale_fill_gradientn(colors = if (palette_option == "viridis") viridis::viridis(100) else if (palette_option == "magma") viridis::magma(5) else rev(RColorBrewer::brewer.pal(11, "RdBu")),
                          limits = limits,
                          name = legend_title,
-                         guide = guide_colorbar(barwidth = 1, barheight = 9, title.position = "right", 
-                                                  title.theme = element_text(angle = 90, hjust = 0.5, size = 10))) + 
+                         guide = guide_colorbar(barwidth = 0.8, barheight = 12, title.position = "right", 
+                                                  title.theme = element_text(angle = 90, hjust = 0.5, size = 12),
+                                                label.theme = element_text(size = 17))) + 
     
     theme(
       plot.title = element_text(hjust = 0.5, size = 14),
@@ -106,18 +107,18 @@ plot_metric = function(df, variable, title = "", legend_title = "", limits, pale
 # Biais
 p1 = plot_metric(df_all, "glorys_biais", limits = c(-2.2, 2.2), palette_option = "RdBu", title = "GLORYS", show_y = TRUE)
 p2 = plot_metric(df_all, "bran_biais", limits = c(-2.2, 2.2), palette_option = "RdBu", title = "BRAN")
-p3 = plot_metric(df_all, "hycom_biais", legend_title = "", limits = c(-2.2, 2.2), palette_option = "RdBu", title = "HYCOM", show_legend = TRUE)
+p3 = plot_metric(df_all, "hycom_biais", legend_title = "°C", limits = c(-2.2, 2.2), palette_option = "RdBu", title = "HYCOM", show_legend = TRUE)
 
 # Corrélation
 p4 = plot_metric(df_all, "glorys_R", limits = c(0.3, 1), palette_option = "viridis", show_y = TRUE)
 p5 = plot_metric(df_all, "bran_R", limits = c(0.3, 1), palette_option = "viridis")
-p6 = plot_metric(df_all, "hycom_R", legend_title = "", limits = c(0.3, 1), palette_option = "viridis", show_legend = TRUE)
+p6 = plot_metric(df_all, "hycom_R", legend_title = "Correlation (r)", limits = c(0.3, 1), palette_option = "viridis", show_legend = TRUE)
 
 # RMSE
 range = range(c(df_all$glorys_rmse_quantil, df_all$bran_rmse_quantil, df_all$hycom_rmse_quantil), na.rm = TRUE)
 p7 = plot_metric(df_all, "glorys_rmse_quantil", limits = range, palette_option = "magma", show_y = TRUE, show_x = TRUE)
 p8 = plot_metric(df_all, "bran_rmse_quantil", limits = range, palette_option = "magma", show_x = TRUE)
-p9 = plot_metric(df_all, "hycom_rmse_quantil", legend_title = "", limits = range, palette_option = "magma", show_legend = TRUE, show_x = TRUE)
+p9 = plot_metric(df_all, "hycom_rmse_quantil", legend_title = "RMSE", limits = range, palette_option = "magma", show_legend = TRUE, show_x = TRUE)
 
 # ---------------------------------------
 # Extraire les légendes
@@ -142,7 +143,7 @@ final_plot = plot_grid(row1, row2, row3, ncol = 1, scale = 1)
 x11(width = 20, height = 10)
 print(final_plot)
 
-save_plot("C:/Users/jdanielou/Desktop/comparison_maps.png", final_plot, base_width = 20, base_height = 10, dpi = 150)
+save_plot("C:/Users/jdanielou/Desktop/comparaison_maps.png", final_plot, base_width = 21, base_height = 10, dpi = 150)
 
 
 
