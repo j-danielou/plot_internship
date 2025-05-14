@@ -126,19 +126,19 @@ plot_metric = function(df, variable, title = "", legend_title = "", limits, pale
 max_abs = max(abs(c(df_all$glorys_spring_bias, df_all$bran_spring_bias, df_all$hycom_spring_bias)), na.rm = TRUE)
 p1 = plot_metric(df_all, "glorys_spring_bias", limits = c(-max_abs, max_abs), palette_option = "RdBu", title = "GLORYS", show_y = TRUE)
 p2 = plot_metric(df_all, "bran_spring_bias", limits = c(-max_abs, max_abs), palette_option = "RdBu", title = "BRAN")
-p3 = plot_metric(df_all, "hycom_spring_bias", legend_title = "", limits = c(-max_abs, max_abs), palette_option = "RdBu", title = "HYCOM", show_legend = TRUE)
+p3 = plot_metric(df_all, "hycom_spring_bias", legend_title = "°C", limits = c(-max_abs, max_abs), palette_option = "RdBu", title = "HYCOM", show_legend = TRUE)
 
 # Corrélation
 range = range(c(df_all$glorys_spring_R, df_all$bran_spring_R, df_all$hycom_spring_R), na.rm = TRUE)
 p4 = plot_metric(df_all, "glorys_spring_R", limits = range, palette_option = "viridis", show_y = TRUE)
 p5 = plot_metric(df_all, "bran_spring_R", limits = range, palette_option = "viridis")
-p6 = plot_metric(df_all, "hycom_spring_R", legend_title = "", limits = range, palette_option = "viridis", show_legend = TRUE)
+p6 = plot_metric(df_all, "hycom_spring_R", legend_title = "Correlation (r)", limits = range, palette_option = "viridis", show_legend = TRUE)
 
 # RMSE
 range = range(c(df_all$glorys_spring_rmse_quantil, df_all$bran_spring_rmse_quantil, df_all$hycom_spring_rmse_quantil), na.rm = TRUE)
 p7 = plot_metric(df_all, "glorys_spring_rmse_quantil", limits = range, palette_option = "magma", show_y = TRUE, show_x = TRUE)
 p8 = plot_metric(df_all, "bran_spring_rmse_quantil", limits = range, palette_option = "magma", show_x = TRUE)
-p9 = plot_metric(df_all, "hycom_spring_rmse_quantil", legend_title = "", limits = range, palette_option = "magma", show_legend = TRUE, show_x = TRUE)
+p9 = plot_metric(df_all, "hycom_spring_rmse_quantil", legend_title = "RMSE", limits = range, palette_option = "magma", show_legend = TRUE, show_x = TRUE)
 
 # ---------------------------------------
 # Extraire les légendes
@@ -163,7 +163,7 @@ final_plot = plot_grid(row1, row2, row3, ncol = 1, scale = 1)
 x11(width = 20, height = 10)
 print(final_plot)
 
-save_plot("C:/Users/jdanielou/Desktop/comparaison_maps_spring.png", final_plot, base_width = 20, base_height = 10, dpi = 150)
+save_plot("C:/Users/jdanielou/Desktop/comparaison_maps_spring.png", final_plot, base_width = 21, base_height = 10, dpi = 150)
 
 
 

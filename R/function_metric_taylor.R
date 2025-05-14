@@ -7,7 +7,7 @@ source("R./function_taylor.R")
 # ------------------------------
 # Charger vos données
 
-model = nc_open("C:/Users/jdanielou/Desktop/reanalysis/regional/southpacific/regrid/hycom-3.1-southpacific-sst-monthly-199301-202112-regrid.nc")
+model = nc_open("C:/Users/jdanielou/Desktop/reanalysis/regional/southpacific/regrid/glorys-v1-southpacific-sst-monthly-199301-202112-regrid.nc")
 model_data = ncvar_get(model, "sst")
 model_data = model_data[1:684,41:320,]
 biais_model = readRDS("C:/Users/jdanielou/Desktop/biais_mean_hycom.rds")
