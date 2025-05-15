@@ -8,8 +8,8 @@ library(RColorBrewer)
 source("R./function_taylor.R")
 # -----------------------------------------
 # Données
-masks = readRDS("C:/Users/jdanielou/Desktop/masks_cluster.rds")
-df_all = readRDS("C:/Users/jdanielou/Desktop/df_all_season.rds") %>%
+masks = readRDS("C:/Users/jdanielou/Desktop/rds/masks_cluster.rds")
+df_all = readRDS("C:/Users/jdanielou/Desktop/rds/df_all_season.rds") %>%
   filter(complete.cases(.))
 
 
@@ -30,40 +30,50 @@ names(cluster_colors) = as.character(1:n_clust)
 
 models = c("glorys", "bran", "hycom")
 pch_set = c(16, 17, 18)
-
+seasons = c("summer", "autumn", "winter", "spring")
 # -----------------------------------------
-# Taylor Diagram
-x11(width = 10, height = 10)
-taylor.diagram(ref = c(1, 1.1), model = c(1, 0.9), label = "Test", add = FALSE)
+# Taylor Diagram avec légende intégrée dans le subplot "autumn"
+x11(width = 12, height = 12)
+par(mfrow = c(2,2), oma = c(0,0,0,0), mar = c(5,5,3,3))  # Ajuste les marges si besoin
 
-for (j in seq_along(clusters)) {
-  cluster = clusters[[j]]
-  for (i in seq_along(models)) {
-    model = models[i]
+for (season in seasons) {
+  taylor.diagram(ref = c(1, 1.1), model = c(1, 0.9), label = "Test", add = FALSE,
+                 main = paste0("Taylor Diagram - ", season))
+  
+  for (j in seq_along(clusters)) {
+    cluster = clusters[[j]]
+    for (i in seq_along(models)) {
+      model = models[i]
+      
+      R_col = cluster[[paste0(model, "_", season, "_R")]]
+      sd_col = cluster[[paste0(model, "_", season, "_sd")]]
+      
+      R_mean = mean(R_col, na.rm = TRUE)
+      sd_mean = mean(sd_col, na.rm = TRUE)
+      
+      x = sd_mean * R_mean
+      y = sd_mean * sin(acos(R_mean))
+      
+      points(x, y, col = cluster_colors[as.character(j)], pch = pch_set[i], cex = 1.4)
+    }
+  }
+  
+  # Afficher les légendes seulement sur le plot "autumn"
+  if (season == "autumn") {
+    legend("topright", legend = c("GLORYS", "BRAN", "HYCOM"),
+           col = "black", pch = pch_set, pt.cex = 2, cex = 1.2, inset = c(-0.19, -0.1), 
+           x.intersp = 0.6, y.intersp = 0.6, bty = "n")
     
-    R_col = cluster[[paste0(model, "_winter_R")]]
-    sd_col = cluster[[paste0(model, "_winter_sd")]]
-    
-    R_mean = mean(R_col, na.rm = TRUE)
-    sd_mean = mean(sd_col, na.rm = TRUE)
-    
-    x = sd_mean * R_mean
-    y = sd_mean * sin(acos(R_mean))
-    
-    points(x, y, col = cluster_colors[as.character(j)], pch = pch_set[i], cex = 1.2)
+    legend("topright", legend = paste("Cluster", 1:n_clust),
+           col = cluster_colors, pch = 15, pt.cex = 2, cex = 1.2, x.intersp = 0.6, y.intersp = 0.6, 
+           inset = c(-0.19, 0.06), bty = "n")
   }
 }
 
-legend("topright", legend = c("GLORYS", "BRAN", "HYCOM"),
-       col = "black", pch = pch_set, pt.cex = 2)
-
-legend("topright", legend = paste("Cluster", 1:n_clust),
-       col = cluster_colors, pch = 15, pt.cex = 2, title = "Cluster", inset = c(0, 0.12))
-
-dev.copy(png,"C:/Users/jdanielou/Desktop/plots_internship/plot/article_plots/taylor/taylor_winter.png", units = "in", width = 10, height = 10, res = 150)
+# Export
+dev.copy(png, "C:/Users/jdanielou/Desktop/plots_internship/plot/article_plots/taylor/taylor_seasons.png", 
+         units = "in", width = 12, height = 12, res = 150)
 dev.off()
-
-
 
 
 
