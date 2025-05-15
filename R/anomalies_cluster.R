@@ -36,8 +36,8 @@ compute_anomalies_by_cluster = function(cluster_data_list, model) {
   return(anomalies_list)
 }
 
-model_by_cluster = readRDS("C:/Users/jdanielou/Desktop/rds/hycom_by_cluster.rds")
-compute_anomalies_by_cluster(cluster_data_list = model_by_cluster, model = "hycom")
+model_by_cluster = readRDS("C:/Users/jdanielou/Desktop/rds/oisst_by_cluster.rds")
+compute_anomalies_by_cluster(cluster_data_list = model_by_cluster, model = "oisst")
 
 
 model_anomalis = readRDS(file = "C:/Users/jdanielou/Desktop/rds/hycom_anomalies.rds")
