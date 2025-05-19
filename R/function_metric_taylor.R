@@ -7,20 +7,19 @@ source("R./function_taylor.R")
 # ------------------------------
 # Charger vos données
 
-model = nc_open("C:/Users/jdanielou/Desktop/reanalysis/regional/southpacific/regrid/glorys-v1-southpacific-sst-monthly-199301-202112-regrid.nc")
-model_data = ncvar_get(model, "sst")
-model_data = model_data[1:684,41:320,]
-biais_model = readRDS("C:/Users/jdanielou/Desktop/biais_mean_hycom.rds")
-x11()
-image(model_data[,,1])
-oisst = nc_open("C:/Users/jdanielou/Desktop/reanalysis/regional/southpacific/oisst-v2.1/oisst-v2r1-southpacific-sst-monthly-198109-202203.nc")
-OISST_data = ncvar_get(oisst, "sst")
-OISST_data = OISST_data[1:684,41:320,149:412]
+model = nc_open("C:/Users/jdanielou/Desktop/reanalysis/regional/southpacific/regrid/hycom-3.1-southpacific-sss-monthly-199301-202312-regrid.nc")
+model_data = ncvar_get(model, "sss")
+model_data = model_data[1:684,41:320,193:264]
+biais_model = readRDS("C:/Users/jdanielou/Desktop/rds/bias_sss_hycom_esa.rds")
+# x11()
+# image(model_data[,,1])
+obs = nc_open("C:/Users/jdanielou/Desktop/reanalysis/regional/southpacific/esacci-v5.5/esacci-v5.5-southpacific-sss-monthly-201001-202312.nc")
+obs_data = ncvar_get(obs, "sss")
+obs_data = obs_data[,,1:72]
 
-lon = ncvar_get(oisst, 'lon')
-lon = lon[1:684]
-lat = ncvar_get(oisst, 'lat')
-lat = lat[41:320]
+lon = ncvar_get(obs, 'lon') #[1:684]
+lat = ncvar_get(obs, 'lat') #[41:320]
+
 
 # ------------------------------
 # Préparation
@@ -47,14 +46,14 @@ step = 0
 # ------------------------------
 # Boucle principale
 
-png("C:/Users/jdanielou/Desktop/plots_internship/plot/plots_taylor/taylor_pixel_hycom_2.png", width = 1200, height = 1200)
+png("C:/Users/jdanielou/Desktop/plots_internship/plot/plots_taylor/taylor_sss_hycom_esa.png", width = 1200, height = 1200)
 par(mar = c(6, 6, 4, 4))
 
 for (i in 1:nlon) {
   for (j in 1:nlat) {
     
     model_ts = model_data[i, j, ]
-    obs_ts = OISST_data[i, j, ]
+    obs_ts = obs_data[i, j, ]
 
     # Initialiser les valeurs par défaut (NA)
     sd_value = NA
@@ -118,4 +117,4 @@ results_df = data.frame(
 head(results_df)
 
 # Export CSV
-write.csv(results_df, "C:/Users/jdanielou/Desktop/plot_internship/csv/metric_csv/hycom/taylor_metrics_pixel_hycom.csv", row.names = FALSE)
+write.csv(results_df, "C:/Users/jdanielou/Desktop/plot_internship/csv/metric_csv/hycom/taylor_metrics_sss_hycom_esa.csv", row.names = FALSE)

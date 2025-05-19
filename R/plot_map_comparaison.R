@@ -13,9 +13,9 @@ library(cowplot)
 # Data
 world = map_data("world2")
 
-glorys_df = read.csv("C:/Users/jdanielou/Desktop/plot_internship/csv/metric_csv/glorys/taylor_metrics_pixel_glorys.csv")
-bran_df = read.csv("C:/Users/jdanielou/Desktop/plot_internship/csv/metric_csv/bran/taylor_metrics_pixel_bran.csv")
-hycom_df = read.csv("C:/Users/jdanielou/Desktop/plot_internship/csv/metric_csv/hycom/taylor_metrics_pixel_hycom.csv")
+glorys_df = read.csv("C:/Users/jdanielou/Desktop/plot_internship/csv/metric_csv/glorys/taylor_metrics_sss_glorys_2005_2014.csv")
+bran_df = read.csv("C:/Users/jdanielou/Desktop/plot_internship/csv/metric_csv/bran/taylor_metrics_sss_bran_2005_2014.csv")
+hycom_df = read.csv("C:/Users/jdanielou/Desktop/plot_internship/csv/metric_csv/hycom/taylor_metrics_sss_hycom_2005_2014.csv")
 
 glorys_df = glorys_df |>
   rename(
@@ -105,14 +105,16 @@ plot_metric = function(df, variable, title = "", legend_title = "", limits, pale
 # ---------------------------------------
 # Génération des plots (exemple avec df_all)
 # Biais
-p1 = plot_metric(df_all, "glorys_biais", limits = c(-2.2, 2.2), palette_option = "RdBu", title = "GLORYS", show_y = TRUE)
-p2 = plot_metric(df_all, "bran_biais", limits = c(-2.2, 2.2), palette_option = "RdBu", title = "BRAN")
-p3 = plot_metric(df_all, "hycom_biais", legend_title = "°C", limits = c(-2.2, 2.2), palette_option = "RdBu", title = "HYCOM", show_legend = TRUE)
+max_abs = max(abs(c(df_all$glorys_bias, df_all$bran_bias, df_all$hycom_bias)), na.rm = TRUE)
+p1 = plot_metric(df_all, "glorys_biais", limits =  c(-max_abs, max_abs), palette_option = "RdBu", title = "GLORYS", show_y = TRUE)
+p2 = plot_metric(df_all, "bran_biais", limits =  c(-max_abs, max_abs), palette_option = "RdBu", title = "BRAN")
+p3 = plot_metric(df_all, "hycom_biais", legend_title = "°C", limits = c(-max_abs, max_abs), palette_option = "RdBu", title = "HYCOM", show_legend = TRUE)
 
 # Corrélation
-p4 = plot_metric(df_all, "glorys_R", limits = c(0.3, 1), palette_option = "viridis", show_y = TRUE)
-p5 = plot_metric(df_all, "bran_R", limits = c(0.3, 1), palette_option = "viridis")
-p6 = plot_metric(df_all, "hycom_R", legend_title = "Correlation (r)", limits = c(0.3, 1), palette_option = "viridis", show_legend = TRUE)
+range = range(c(df_all$glorys_R, df_all$bran_R, df_all$hycom_R), na.rm = TRUE)
+p4 = plot_metric(df_all, "glorys_R", limits = range, palette_option = "viridis", show_y = TRUE)
+p5 = plot_metric(df_all, "bran_R", limits = range, palette_option = "viridis")
+p6 = plot_metric(df_all, "hycom_R", legend_title = "Correlation (r)", limits = range, palette_option = "viridis", show_legend = TRUE)
 
 # RMSE
 range = range(c(df_all$glorys_rmse_quantil, df_all$bran_rmse_quantil, df_all$hycom_rmse_quantil), na.rm = TRUE)
@@ -143,7 +145,7 @@ final_plot = plot_grid(row1, row2, row3, ncol = 1, scale = 1)
 x11(width = 20, height = 10)
 print(final_plot)
 
-save_plot("C:/Users/jdanielou/Desktop/comparaison_maps.png", final_plot, base_width = 21, base_height = 10, dpi = 150)
+save_plot("C:/Users/jdanielou/Desktop/comparaison_maps_sss_2005_2014.png", final_plot, base_width = 21, base_height = 10, dpi = 150)
 
 
 

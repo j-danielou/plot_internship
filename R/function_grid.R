@@ -6,14 +6,14 @@ library(ggplot2)
 
 
 # === Chmaps# === Charger fichier NetCDF ===
-nc_file =  nc_open("C:/Users/jdanielou/Desktop/reanalysis/regional/southpacific/regrid/glorys-v1-southpacific-sst-monthly-199301-202112-regrid.nc")
-nc_oisst = nc_open("C:/Users/jdanielou/Desktop/reanalysis/regional/southpacific/oisst-v2.1/oisst-v2r1-southpacific-sst-monthly-198109-202203.nc")
+nc_file =  nc_open("C:/Users/jdanielou/Desktop/reanalysis/regional/southpacific/esacci-v5.5/esacci-v5.5-southpacific-sss-monthly-201001-202312.nc")
+nc_oisst = nc_open("C:/Users/jdanielou/Desktop/reanalysis/regional/southpacific/esacci-v5.5/esacci-v5.5-southpacific-sss-monthly-201001-202312.nc")
 
 
 # === Lire les dimensions ===
-lon = ncvar_get(nc_file, "longitude")[1:684]  
-lat = ncvar_get(nc_file, "latitude")[41:320] 
-time = ncvar_get(nc_oisst, "time")[137:484]
+lon = ncvar_get(nc_file, "lon")[]  
+lat = ncvar_get(nc_file, "lat")[] 
+time = ncvar_get(nc_oisst, "time")[]
 
 # Convertir le temps en date
 time_units = ncatt_get(nc_oisst, "time", "units")$value
@@ -22,7 +22,7 @@ dates = as.Date(time, origin = origin_str)
 
 # === Lire la variable SST ===
 
-sst = ncvar_get(nc_file, "sst")[1:684,41:320,]
+sss = ncvar_get(nc_file, "sss")[]
 
 # === Fermer le fichier ===
 nc_close(nc_file)
@@ -33,9 +33,9 @@ grid = expand.grid(
   lon = lon,
   time = dates
 )
-sst2 = aperm(sst, c(2, 1, 3))
-grid$sst = as.vector(sst2)
+sss2 = aperm(sss, c(2, 1, 3))
+grid$sss = as.vector(sss2)
 
-saveRDS(grid, file = "C:/Users/jdanielou/Desktop/rds/sst_glorys.rds")
+saveRDS(grid, file = "C:/Users/jdanielou/Desktop/rds/sss_esa.rds")
 
 
