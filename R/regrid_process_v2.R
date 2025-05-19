@@ -4,17 +4,17 @@ library(ncdf4)
 
 rea_products = c("glorys-v1", "bran-2020", "hycom-3.1")
 path = "C:/Users/jdanielou/Desktop/reanalysis/regional/southpacific"
-file_obs = "C:/Users/jdanielou/Desktop/reanalysis/regional/southpacific/oisst-v2.1/oisst-v2r1-southpacific-sst-monthly-198109-202203.nc"
+file_obs = "C:/Users/jdanielou/Desktop/reanalysis/regional/southpacific/cmems/cmems-l4-southpacific-sss-monthly-199301-202112.nc"
 
 for (product in rea_products) {
   # file
-  file_rea = list.files(path = file.path(path,product), pattern =  ".*sst", recursive = TRUE, include.dirs = FALSE, full.names = TRUE)
+  file_rea = list.files(path = file.path(path,product), pattern =  ".*sss", recursive = TRUE, include.dirs = FALSE, full.names = TRUE)
   
   # path setting
-  if (product != "hycom") {
-    file_out = file.path(path, "regrid", paste0(product, "-southpacific-sst-monthly-199301-202112-regrid.nc"))
+  if (product != "hycom-3.1") {
+    file_out = file.path(path, "regrid", paste0(product, "-southpacific-sss-monthly-199301-202112-cmems-regrid.nc"))
   } else {
-    file_out = file.path(path, "regrid", paste0(product, "-southpacific-sst-monthly-199401-201512-regrid.nc"))
+    file_out = file.path(path, "regrid", paste0(product, "-southpacific-sss-monthly-199401-201512-cmems-regrid.nc"))
   }
   file_tmp = paste0(file_out, ".tmp")  # Temp file
   
