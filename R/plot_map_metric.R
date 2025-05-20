@@ -13,9 +13,9 @@ library(cowplot)
 # Data
 world = map_data("world2")
 
-glorys_df = read.csv("C:/Users/jdanielou/Desktop/plot_internship/csv/metric_csv/glorys/taylor_metrics_sss_glorys_2005_2014.csv")
-bran_df = read.csv("C:/Users/jdanielou/Desktop/plot_internship/csv/metric_csv/bran/taylor_metrics_sss_bran_2005_2014.csv")
-hycom_df = read.csv("C:/Users/jdanielou/Desktop/plot_internship/csv/metric_csv/hycom/taylor_metrics_sss_hycom_2005_2014.csv")
+glorys_df = read.csv("C:/Users/jdanielou/Desktop/plot_internship/csv/metric_csv/glorys/taylor_metrics_pixel_glorys.csv")
+bran_df = read.csv("C:/Users/jdanielou/Desktop/plot_internship/csv/metric_csv/bran/taylor_metrics_pixel_bran.csv")
+hycom_df = read.csv("C:/Users/jdanielou/Desktop/plot_internship/csv/metric_csv/hycom/taylor_metrics_pixel_hycom.csv")
 
 glorys_df = glorys_df |>
   rename(
@@ -23,7 +23,7 @@ glorys_df = glorys_df |>
     glorys_R = R,
     glorys_sd = sd,
     glorys_rmse = rmse,
-    glorys_biais = biais
+    glorys_bias = biais
   )
 
 bran_df = bran_df |>
@@ -32,7 +32,7 @@ bran_df = bran_df |>
     bran_R = R,
     bran_sd = sd,
     bran_rmse = rmse,
-    bran_biais = biais
+    bran_bias = biais
   )
 
 hycom_df = hycom_df |>
@@ -41,7 +41,7 @@ hycom_df = hycom_df |>
     hycom_R = R,
     hycom_sd = sd,
     hycom_rmse = rmse,
-    hycom_biais = biais
+    hycom_bias = biais
   )
 
 df_all = glorys_df |>
@@ -54,14 +54,26 @@ c2t = gts:::coord2text
 cl = gts:::checkLongitude
 # -----------------------------------------
 # function
-quantil_troncate = function(data, quantil, na.rm=TRUE){
+quantil_troncate = function(data, quantil, sign = ">", na.rm=TRUE){
   dat_glo = data
-  dat_glo[dat_glo>quantile(data, quantil, na.rm = na.rm)] = quantile(data, quantil, na.rm = na.rm)
+  if (sign ==">"){
+    dat_glo[dat_glo>quantile(data, quantil, na.rm = na.rm)] = quantile(data, quantil, na.rm = na.rm)
+  }else{
+    dat_glo[dat_glo<quantile(data, quantil, na.rm = na.rm)] = quantile(data, quantil, na.rm = na.rm)
+  }
   return(dat_glo)
 }
 df_all$glorys_rmse_quantil = quantil_troncate(data = df_all$glorys_rmse, quantil = 0.99)
 df_all$bran_rmse_quantil = quantil_troncate(data = df_all$bran_rmse, quantil = 0.99)
 df_all$hycom_rmse_quantil = quantil_troncate(data = df_all$hycom_rmse, quantil = 0.99)
+
+df_all$glorys_bias_quantil = quantil_troncate(data = df_all$glorys_bias, quantil = 0.002, sign = "<")
+df_all$bran_bias_quantil = quantil_troncate(data = df_all$bran_bias, quantil = 0.002, sign = "<")
+df_all$hycom_bias_quantil = quantil_troncate(data = df_all$hycom_bias, quantil = 0.002, sign = "<")
+
+df_all$glorys_bias_quantil = quantil_troncate(data = df_all$glorys_bias_quantil, quantil = 0.999)
+df_all$bran_bias_quantil = quantil_troncate(data = df_all$bran_bias_quantil, quantil = 0.999)
+df_all$hycom_bias_quantil = quantil_troncate(data = df_all$hycom_bias_quantil, quantil = 0.999)
 # -----------------------------------------
 # function
 plot_metric = function(df, variable, title = "", legend_title = "", limits, palette_option = "viridis", show_x = FALSE, show_y = FALSE, show_legend = FALSE) {
@@ -89,7 +101,7 @@ plot_metric = function(df, variable, title = "", legend_title = "", limits, pale
                                                 label.theme = element_text(size = 17))) + 
     
     theme(
-      plot.title = element_text(hjust = 0.5, size = 14),
+      plot.title = element_text(hjust = 0.5, size = 18),
       axis.title = element_blank(),
       axis.text.x = if (show_x) element_text(size = 15) else element_blank(),
       axis.text.y = if (show_y) element_text(size = 15) else element_blank(),
@@ -105,16 +117,16 @@ plot_metric = function(df, variable, title = "", legend_title = "", limits, pale
 # ---------------------------------------
 # Génération des plots (exemple avec df_all)
 # Biais
-max_abs = max(abs(c(df_all$glorys_bias, df_all$bran_bias, df_all$hycom_bias)), na.rm = TRUE)
-p1 = plot_metric(df_all, "glorys_biais", limits =  c(-max_abs, max_abs), palette_option = "RdBu", title = "GLORYS", show_y = TRUE)
-p2 = plot_metric(df_all, "bran_biais", limits =  c(-max_abs, max_abs), palette_option = "RdBu", title = "BRAN")
-p3 = plot_metric(df_all, "hycom_biais", legend_title = "°C", limits = c(-max_abs, max_abs), palette_option = "RdBu", title = "HYCOM", show_legend = TRUE)
+max_abs = max(abs(c(df_all$glorys_bias_quantil, df_all$bran_bias_quantil, df_all$hycom_bias_quantil)), na.rm = TRUE)
+p1 = plot_metric(df_all, "glorys_bias_quantil", limits =  c(-max_abs, max_abs), palette_option = "RdBu", title = "GLORYS", show_y = TRUE)
+p2 = plot_metric(df_all, "bran_bias_quantil", limits =  c(-max_abs, max_abs), palette_option = "RdBu", title = "BRAN")
+p3 = plot_metric(df_all, "hycom_bias_quantil", legend_title = "bias (°C)", limits = c(-max_abs, max_abs), palette_option = "RdBu", title = "HYCOM", show_legend = TRUE)
 
 # Corrélation
 range = range(c(df_all$glorys_R, df_all$bran_R, df_all$hycom_R), na.rm = TRUE)
 p4 = plot_metric(df_all, "glorys_R", limits = range, palette_option = "viridis", show_y = TRUE)
 p5 = plot_metric(df_all, "bran_R", limits = range, palette_option = "viridis")
-p6 = plot_metric(df_all, "hycom_R", legend_title = "Correlation (r)", limits = range, palette_option = "viridis", show_legend = TRUE)
+p6 = plot_metric(df_all, "hycom_R", legend_title = "Correlation", limits = range, palette_option = "viridis", show_legend = TRUE)
 
 # RMSE
 range = range(c(df_all$glorys_rmse_quantil, df_all$bran_rmse_quantil, df_all$hycom_rmse_quantil), na.rm = TRUE)
@@ -145,8 +157,24 @@ final_plot = plot_grid(row1, row2, row3, ncol = 1, scale = 1)
 x11(width = 20, height = 10)
 print(final_plot)
 
-save_plot("C:/Users/jdanielou/Desktop/comparaison_maps_sss_2005_2014.png", final_plot, base_width = 21, base_height = 10, dpi = 150)
+save_plot("C:/Users/jdanielou/Desktop/comparaison_maps_sss_cmems.png", final_plot, base_width = 21, base_height = 10, dpi = 150)
 
 
+
+
+
+test = readRDS("C:/Users/jdanielou/Desktop/rds/df_all.rds")
+
+
+quantile(df_all$glorys_bias, c(0,0.0001,0.002,0.1,0.5,0.99,0.999), na.rm = TRUE)
+x11()
+plot(ecdf(df_all$glorys_bias))
+
+dat2 = df_all$hycom_bias
+dat2[dat2<quantile(df_all$hycom_bias, 0.002, na.rm = TRUE)] = quantile(df_all$hycom_bias, 0.002, na.rm = TRUE)
+
+x11()
+hist(dat2, breaks =quantile(df_all$glorys_bias, c(0,0.0001,0.002,0.1,0.5,0.99,0.999), na.rm = TRUE))
+plot(ecdf(dat2))
 
 
