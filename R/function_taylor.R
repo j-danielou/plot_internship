@@ -8,7 +8,7 @@ taylor.diagram = function (ref, model, label, add = FALSE,
                            ref.sd = TRUE, 
                            grad.corr.lines = c(2, 4, 6, 8, 9, 9.5, 9.9)/10, 
                            pcex = 0.7, tcex=0.7, normalize = TRUE, 
-                           mar = c(5, 5, 3, 3), ...) 
+                           mar = c(5, 5, 3, 3), test = "sst", ...) 
 {
   
   grad.corr.full = seq(0,1, by=0.2)
@@ -19,7 +19,8 @@ taylor.diagram = function (ref, model, label, add = FALSE,
     sd.f = sd.f/sd.r
     sd.r = 1
   }
-  maxsd = 1.5 * max(sd.f, sd.r)
+  #maxsd = ifelse(test == TRUE, 11, 1.5 * max(sd.f, sd.r))
+  maxsd = ifelse(test == "sss", 11, 2)
   oldpar = par("mar", "xpd", "xaxs", "yaxs")
   if (!add) {
     if (pos.cor) {

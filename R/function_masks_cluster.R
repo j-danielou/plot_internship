@@ -1,4 +1,4 @@
-df_all = readRDS(file = "C:/Users/jdanielou/Desktop/df_all.rds")
+df_all = readRDS(file = "C:/Users/jdanielou/Desktop/rds/df_all.rds")
 
 df_all$cluster_final_reordered_corrected = df_all$cluster_final_reordered
 
@@ -28,13 +28,13 @@ df_all$cluster_final_reordered_corrected[
 ] = 3
 
 
-clusters = unique(df_all$cluster_final_reordered_corrected)
+clusters = sort(unique(df_all$cluster_final_reordered_corrected))
 saveRDS(df_all, file = "C:/Users/jdanielou/Desktop/df_all.rds")
 
 
 masks = lapply(clusters, function(cl) df_all$cluster_final_reordered_corrected == cl)
-names(masks) = paste0("mask_cluster", clusters)
-saveRDS(masks, file = "C:/Users/jdanielou/Desktop/masks_cluster.rds")
+names(masks) = paste0("mask_cluster-", clusters)
+saveRDS(masks, file = "C:/Users/jdanielou/Desktop/rds/masks_cluster.rds")
 
 
 

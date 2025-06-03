@@ -125,5 +125,5 @@ for (i in 1:6) {
   }
   
 }  
-dev.copy(png, file = "C:/Users/jdanielou/Desktop/climato-anomalies-cluster.png", width = 18, height = 10, units = "in", res = 200)
+dev.copy(png, file = "C:/Users/jdanielou/Desktop/climato-anomalies-cluster.png", width = 18, height = 10, units = "in", res = 150)
 dev.off() 

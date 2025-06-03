@@ -62,6 +62,9 @@ reorder_and_plot_clusters = function(df_all, clust1_path, clust2_path, prefix, c
   names(recode_vector) = centroids_df$cluster
   df_all$cluster_final_reordered = recode_vector[as.character(df_all$cluster_final)]
   
+  cluster_labels = c("1" = "PCT", "2" = "MNO", "3" = "PEE",
+                     "4" = "SEA", "5" = "PSE", "6" = "PNG", "7" = "ZCI")
+  
   # Couleurs
   n_clust = nrow(centroids_df)
   if (is.null(colors)) {
@@ -72,8 +75,8 @@ reorder_and_plot_clusters = function(df_all, clust1_path, clust2_path, prefix, c
   
   if (prefix != "full"){
     col = colorful::divergencePalette(n=8, col=c("dodgerblue3", "firebrick4"), intensity=1)
-    col[7] = "grey10"
-    length(col) = 7
+    #col[7] = "grey10"
+    length(col) = 8
     names(col) = as.character(1:n_clust)
     
     # Taylor Diagram
@@ -92,7 +95,7 @@ reorder_and_plot_clusters = function(df_all, clust1_path, clust2_path, prefix, c
            col = "black", pch = pch_set, pt.cex = 2, inset = c(-0.05, -0.05))
     legend("topright", legend = paste("Cluster", 1:n_clust),
            col = col, pch = 15, pt.cex = 2, inset = c(-0.05, 0.08))
-    dev.copy(png, file = paste0("C:/Users/jdanielou/Desktop/taylor-diagram-cluster-",prefix,".png"), width = 10, height = 10, units = "in", res = 150)
+    dev.copy(png, file = paste0("C:/Users/jdanielou/Desktop/taylor-diagram-cluster-supp",prefix,".png"), width = 10, height = 10, units = "in", res = 150)
     dev.off()
   }else{
     col = colorful::divergencePalette(n=8, col=c("dodgerblue3", "firebrick4"), intensity=1)
@@ -123,7 +126,7 @@ reorder_and_plot_clusters = function(df_all, clust1_path, clust2_path, prefix, c
            col = "black", pch = pch_set, pt.cex = 2, inset = c(-0.05, -0.05))
     legend("topright", legend = paste("Cluster", 1:n_clust),
            col = col, pch = 15, pt.cex = 2, inset = c(-0.05, 0.08))
-    dev.copy(png, file = paste0("C:/Users/jdanielou/Desktop/taylor-diagram-cluster-",prefix,".png"), width = 10, height = 10, units = "in", res = 150)
+    dev.copy(png, file = paste0("C:/Users/jdanielou/Desktop/taylor-diagram-cluster-supp-",prefix,".png"), width = 10, height = 10, units = "in", res = 150)
     dev.off()
   }
   
@@ -134,11 +137,11 @@ reorder_and_plot_clusters = function(df_all, clust1_path, clust2_path, prefix, c
   x11(width = 16, height = 8)
   p = ggplot() +
     geom_polygon(data = map_data("world2"), aes(x = long, y = lat, group = group),
-                 fill = "grey90", color = "grey70") +
+                 fill = "grey80", color = "black", linewidth = 0.1, inherit.aes = FALSE) +
     geom_point(data = df_all, aes(x = lon, y = lat, color = as.factor(cluster_final_reordered)),
                size = 1) +
     coord_fixed(xlim = range(df_all$lon), ylim = range(df_all$lat), expand = FALSE) +
-    scale_color_manual(values = colors) +
+    scale_color_manual(values = colors, labels = cluster_labels) +
     scale_x_continuous(breaks = pretty(df_all$lon, n=6), labels = c2t(cl(pretty(df_all$lon, n=6)), "lon"), expand = c(0, 0))+
     scale_y_continuous(breaks = pretty(df_all$lat, n=4), labels = c2t(pretty(df_all$lat, n=4), "lat"), expand = c(0,0))+
     labs(color = "Cluster", title = "") +
@@ -203,7 +206,11 @@ saveRDS(result$df, file ="C:/Users/jdanielou/Desktop/df_all.rds")
 ###########################
 #######   TEST   ##########
 ###########################
-prefix="hycom"
+
+
+
+
+prefix="glorys"
 centroids_df = as.data.frame(result$clust1$centroids)[, 1:3]
 colnames(centroids_df) = paste0(prefix, c("_crmsd", "_R", "_sd"))
 centroids_df$cluster = 1:nrow(centroids_df)
@@ -229,21 +236,29 @@ names(recode_vector) = centroids_df$cluster
 col = colorful::divergencePalette(n=1000, col=c("dodgerblue3", "firebrick4"), intensity=0.2)
 result_df_all = result$df
 result_df_all$cluster_final_reordered = recode_vector[as.character(result_df_all$cluster)]
+
+c2t = gts:::coord2text
+cl = gts:::checkLongitude
+
 x11(width = 16, height = 12)
 ggplot() +
   geom_polygon(data = map_data("world2"), aes(x = long, y = lat, group = group),
-               fill = "grey90", color = "grey70") +
+               fill = "grey80", color = "black", linewidth = 0.1, inherit.aes = FALSE) +
   geom_point(data = result_df_all, aes(x = lon, y = lat, color = as.factor(cluster_final_reordered)),
              size = 1) +
-  coord_fixed(xlim = range(df_all$lon), ylim = range(df_all$lat), expand = FALSE) +
+  coord_fixed(xlim = range(result_df_all$lon), ylim = range(result_df_all$lat), expand = FALSE) +
   scale_color_manual(values = col) +
-  labs(color = "Cluster", title = paste0("Clusters des pixels - ")) +
+  scale_x_continuous(breaks = pretty(result_df_all$lon, n=6), labels = c2t(cl(pretty(result_df_all$lon, n=6)), "lon"), expand = c(0, 0))+
+  scale_y_continuous(breaks = pretty(result_df_all$lat, n=4), labels = c2t(pretty(result_df_all$lat, n=4), "lat"), expand = c(0,0))+
+  labs(color = "Cluster", title = "") +
+  guides(color = guide_legend(override.aes = list(size = 10), label.theme = element_text(size = 15),
+                              title.theme = element_text(size = 15))) + 
   theme_minimal() +
-  theme(plot.title = element_text(hjust = 0.5, size = 18),
+  theme(plot.title = element_blank(),
         axis.title = element_blank(),
+        axis.text.x = element_text(size = 15),
+        axis.text.y = element_text(size = 15),
         legend.position = "none")
-
-
-
-
-
+        
+dev.copy(png, file = paste0("C:/Users/jdanielou/Desktop/map-cluster-supp",prefix,".png"), width = 16, height = 7, units = "in", res = 200)
+dev.off() 
