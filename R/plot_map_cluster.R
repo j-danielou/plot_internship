@@ -207,9 +207,6 @@ saveRDS(result$df, file ="C:/Users/jdanielou/Desktop/df_all.rds")
 #######   TEST   ##########
 ###########################
 
-
-
-
 prefix="glorys"
 centroids_df = as.data.frame(result$clust1$centroids)[, 1:3]
 colnames(centroids_df) = paste0(prefix, c("_crmsd", "_R", "_sd"))
