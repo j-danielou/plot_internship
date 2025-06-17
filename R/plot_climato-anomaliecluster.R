@@ -3,17 +3,17 @@ library(dplyr)
 
 # Charger les climatologies et anomalies
 climatologies = list(
-  oisst = readRDS("C:/Users/jdanielou/Desktop/rds/oisst_climatologies.rds"),
-  bran = readRDS("C:/Users/jdanielou/Desktop/rds/bran_climatologies.rds"),
-  hycom = readRDS("C:/Users/jdanielou/Desktop/rds/hycom_climatologies.rds"),
-  glorys = readRDS("C:/Users/jdanielou/Desktop/rds/glorys_climatologies.rds")
+  cmems = readRDS("C:/Users/jdanielou/Desktop/rds/cmems_climatologies_sss.rds"),
+  bran = readRDS("C:/Users/jdanielou/Desktop/rds/bran_climatologies_sss.rds"),
+  hycom = readRDS("C:/Users/jdanielou/Desktop/rds/hycom_climatologies_sss.rds"),
+  glorys = readRDS("C:/Users/jdanielou/Desktop/rds/glorys_climatologies_sss.rds")
 )
 
 anomalies = list(
-  oisst = readRDS("C:/Users/jdanielou/Desktop/rds/oisst_anomalies.rds"),
-  bran = readRDS("C:/Users/jdanielou/Desktop/rds/bran_anomalies.rds"),
-  hycom = readRDS("C:/Users/jdanielou/Desktop/rds/hycom_anomalies.rds"),
-  glorys = readRDS("C:/Users/jdanielou/Desktop/rds/glorys_anomalies.rds")
+  cmems = readRDS("C:/Users/jdanielou/Desktop/rds/cmems_anomalies_sss.rds"),
+  bran = readRDS("C:/Users/jdanielou/Desktop/rds/bran_anomalies_sss.rds"),
+  hycom = readRDS("C:/Users/jdanielou/Desktop/rds/hycom_anomalies_sss.rds"),
+  glorys = readRDS("C:/Users/jdanielou/Desktop/rds/glorys_anomalies_sss.rds")
 )
 
 clusters = paste0("cluster", 1:6)
@@ -22,7 +22,7 @@ model_names = names(climatologies)
 
 # Ouvrir la fenêtre graphique
 x11(width = 18, height = 16)
-par(mfrow = c(6, 2), mar = c(1.1, 2.2, 1.1, 2.2), oma = c(1.3, 5.5, 1, 1.5), 
+par(mfrow = c(6, 2), mar = c(1.1, 2.2, 1.1, 2.2), oma = c(1.3, 5.5, 1, 5), 
     cex.axis = 1.8, cex.lab = 2, las=1)
 
 for (i in 1:6) {
@@ -32,14 +32,14 @@ for (i in 1:6) {
   # Calcul des limites
   clim_vals = unlist(lapply(climatologies, function(m) m[[cluster]]$climatology))
   ylim_clim = range(clim_vals, na.rm = TRUE) + c(-0.2, 0.2)
-  months_numeric = as.numeric(climatologies$oisst[[cluster]]$month)
-  month_labels = levels(climatologies$oisst[[cluster]]$month)
+  months_numeric = as.numeric(climatologies$cmems[[cluster]]$month)
+  month_labels = levels(climatologies$cmems[[cluster]]$month)
 
   plot(x = months_numeric,
-       y = climatologies$oisst[[cluster]]$climatology,
+       y = climatologies$cmems[[cluster]]$climatology,
        type = "l", col = colors[1], lwd = 1.5,
        ylim = ylim_clim,
-       ylab = "SST (°C)",
+       ylab = "PSU",
        xaxt = ifelse(i < 7, "n", "s"),
        yaxt = "n",
        xlab = "")
@@ -56,7 +56,7 @@ for (i in 1:6) {
     # Légende gauche
     legend(x = usr[1] + 0.52 * diff(usr[1:2]),
            y = usr[4] - 0.02 * diff(usr[3:4]),
-           legend = c("OISST", "BRAN"),
+           legend = c("CMEMS", "BRAN"),
            col = colors[1:2], lwd = 2, bty = "n", cex = 1.5, x.intersp = 0.5)
     
     # Légende droite
@@ -75,7 +75,7 @@ for (i in 1:6) {
   date_max = as.Date("2015-12-31")
   
   # Référence OISST filtrée
-  oisst_df = anomalies$oisst[[cluster]] %>%
+  cmems_df = anomalies$cmems[[cluster]] %>%
     filter(time >= date_min & time <= date_max)
   
   # Définir les limites y
@@ -86,8 +86,8 @@ for (i in 1:6) {
   })), na.rm = TRUE) + c(-0.2, 0.2)
   
   # Plot OISST
-  plot(x = oisst_df$time,
-       y = oisst_df$anomaly,
+  plot(x = cmems_df$time,
+       y = cmems_df$anomaly,
        type = "l", col = colors[1], lwd = 1.5,
        ylim = ylim_anom,
        xaxt = ifelse(i < 7, "n", "s"),
@@ -106,7 +106,7 @@ for (i in 1:6) {
     
     lines(mod_df$time, mod_df$anomaly, col = colors[j], lwd = 1.5)
     
-    common = inner_join(oisst_df, mod_df, by = "time", suffix = c("_ref", "_mod"))
+    common = inner_join(cmems_df, mod_df, by = "time", suffix = c("_ref", "_mod"))
     r = round(cor(common$anomaly_ref, common$anomaly_mod, use = "complete.obs"), 2)
     rmse = round(sqrt(mean((common$anomaly_ref - common$anomaly_mod)^2, na.rm = TRUE)), 2)
     
@@ -125,5 +125,5 @@ for (i in 1:6) {
   }
   
 }  
-dev.copy(png, file = "C:/Users/jdanielou/Desktop/climato-anomalies-cluster.png", width = 18, height = 10, units = "in", res = 150)
+dev.copy(png, file = "C:/Users/jdanielou/Desktop/climato-anomalies-cluster-sss-test.png", width = 18, height = 10, units = "in", res = 150)
 dev.off() 
