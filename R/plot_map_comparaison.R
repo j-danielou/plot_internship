@@ -11,9 +11,9 @@ source("R./function_taylor.R")
 # Data
 world = map_data("world2")
 
-glorys_df = read.csv("C:/Users/jdanielou/Desktop/plot_internship/csv/metric_csv/glorys/taylor_metrics_pixel_glorys.csv")
-bran_df = read.csv("C:/Users/jdanielou/Desktop/plot_internship/csv/metric_csv/bran/taylor_metrics_pixel_bran.csv")
-hycom_df = read.csv("C:/Users/jdanielou/Desktop/plot_internship/csv/metric_csv/hycom/taylor_metrics_pixel_hycom.csv")
+glorys_df = read.csv("C:/Users/jdanielou/Desktop/plot_internship/csv/metric_csv/glorys/taylor_metrics_sss_glorys_cmems_025.csv")
+bran_df = read.csv("C:/Users/jdanielou/Desktop/plot_internship/csv/metric_csv/bran/taylor_metrics_sss_bran_cmems_025.csv")
+hycom_df = read.csv("C:/Users/jdanielou/Desktop/plot_internship/csv/metric_csv/hycom/taylor_metrics_sss_hycom_cmems_025.csv")
 
 glorys_df = glorys_df %>%
   rename(
@@ -50,71 +50,37 @@ df_all_clean = df_all %>%
   filter(complete.cases(.))
 # -----------------------------------------
 # function
-reorder_and_plot_clusters = function(df_all, clust1_path, clust2_path, prefix,
-                                     show_x = FALSE, show_y = FALSE, show_legend = FALSE) {
+plot_clusters = function(df_model, prefix, show_x = FALSE, show_y = FALSE, show_legend = FALSE) {
   
   # Fond de carte
   world = map_data("world2")
-  
-  # Charger les clusters
-  clust1 = readRDS(clust1_path)
-  clust2 = readRDS(clust2_path)
-  
-  # Appliquer les clusters aux points
-  df_all$cluster = clust1$clusters
-  df_all$cluster_final = clust2$clusters[df_all$cluster]
-  
-  # Charger les centroïdes et calculer leur distance à l'idéal
-  centroids_df = as.data.frame(clust2$centroids)[, 1:3]
-  colnames(centroids_df) = paste0(prefix, c("_crmsd", "_R", "_sd"))
-  centroids_df$cluster = 1:nrow(centroids_df)
-  
-  target = c(crmsd = 0, R = 1, sd = 1)
-  centroids_df$distance_to_target = sqrt(
-    (centroids_df[[1]] - target["crmsd"])^2 +
-      (centroids_df[[2]] - target["R"])^2 +
-      (centroids_df[[3]] - target["sd"])^2
-  )
-  
-  # Créer un vecteur nommé pour associer chaque cluster à sa distance
-  map_cluster_to_distance = setNames(centroids_df$distance_to_target, centroids_df$cluster)
-  df_all$distance_to_target = map_cluster_to_distance[as.character(df_all$cluster_final)]
-  
-  # Vérification
-  if (all(is.na(df_all$distance_to_target))) {
-    stop("Aucune correspondance entre clusters et distances : vérifiez les index.")
-  }
-  
-  # Centrer la palette sur la médiane
-  dist_mean = mean(df_all$distance_to_target, na.rm = TRUE)
-  message(dist_mean)
+  color_palette = colorRampPalette(c("dodgerblue3", "white", "firebrick4"))(1000)
   
   # Fonctions de formatage des axes
   c2t = gts:::coord2text
   cl = gts:::checkLongitude
   
   # Générer le plot
-  p = ggplot() +
+  p =   ggplot() +
     geom_polygon(data = world, aes(x = long, y = lat, group = group),
                  fill = "grey80", color = "black", linewidth = 0.1, inherit.aes = FALSE) +
-    geom_point(data = df_all, aes(x = lon, y = lat, color = distance_to_target), size = 0.4) +
-    coord_fixed(xlim = range(df_all$lon, na.rm = TRUE),
-                ylim = range(df_all$lat, na.rm = TRUE),
+    geom_point(data = df_model, aes(x = lon, y = lat, color = D), size = 0.4) +
+    coord_fixed(xlim = range(df_model$lon, na.rm = TRUE),
+                ylim = range(df_model$lat, na.rm = TRUE),
                 expand = FALSE) +
     scale_color_gradientn(
-      colours = colorRampPalette(c("dodgerblue3", "white", "firebrick4"))(1000),
-      limits = c(0, 10),
-      values = scales::rescale(c(0, 0.95, 10)),
+      colours = color_palette,
+      limits = c(0.13, 1.13),
       name = "Distance"
     )+
     scale_x_continuous(
-      breaks = pretty(df_all$lon, n = 6),
-      labels = c2t(cl(pretty(df_all$lon, n = 6)), "lon"),
+      breaks = pretty(df_model$lon, n = 6),
+      labels = c2t(cl(pretty(df_model$lon, n = 6)), "lon"),
       expand = c(0, 0)
     ) +
     scale_y_continuous(
-      breaks = pretty(df_all$lat, n = 4),
-      labels = c2t(pretty(df_all$lat, n = 4), "lat"),
+      breaks = pretty(df_model$lat, n = 4),
+      labels = c2t(pretty(df_model$lat, n = 4), "lat"),
       expand = c(0, 0)
     ) +
     theme_minimal(base_size = 12) +
@@ -222,13 +188,11 @@ p8 = plot_metric(df_all, "bran_rmse_quantil", limits = range, palette_option = "
 p9 = plot_metric(df_all, "hycom_rmse_quantil", legend_title = "RMSE", limits = range, palette_option = "magma", show_legend = TRUE)
 
 #Cluster
+distance_maps = readRDS("C:/Users/jdanielou/Desktop/rds/distance_sss.rds")
 
-p10 = reorder_and_plot_clusters(df_all = df_all_clean, clust1_path = "C:/Users/jdanielou/Desktop/clust_centroid_glorys.rds",
-                                clust2_path = "C:/Users/jdanielou/Desktop/clust_centroid_2_glorys.rds", prefix = "glorys", show_y = TRUE, show_x = TRUE)
-p11 = reorder_and_plot_clusters(df_all = df_all_clean, clust1_path = "C:/Users/jdanielou/Desktop/clust_centroid_bran.rds",
-                                clust2_path = "C:/Users/jdanielou/Desktop/clust_centroid_2_bran.rds", prefix = "bran", show_x = TRUE)
-p12 = reorder_and_plot_clusters(df_all = df_all_clean, clust1_path = "C:/Users/jdanielou/Desktop/clust_centroid_hycom.rds",
-                                clust2_path = "C:/Users/jdanielou/Desktop/clust_centroid_2_hycom.rds", prefix = "hycom", show_legend = TRUE, show_x = TRUE)
+p10 = plot_clusters(df_model = distance_maps$glorys, prefix = "glorys", show_y = TRUE, show_x = TRUE)
+p11 = plot_clusters(df_model = distance_maps$bran, prefix = "bran", show_x = TRUE)
+p12 = plot_clusters(df_model = distance_maps$hycom, prefix = "hycom", show_legend = TRUE, show_x = TRUE)
 
 # ---------------------------------------
 # Extraire les légendes
@@ -254,5 +218,4 @@ row4 = plot_grid(p10, p11, p12, legend_cluster, ncol = 4, rel_widths = standard_
 
 # Plot final
 final_plot = plot_grid(row1, row2, row3, row4, ncol = 1, align = "v", axis = "lr", rel_heights = c(1.5, 1.5, 1.5, 1.7))
-save_plot("C:/Users/jdanielou/Desktop/comparaison_maps_sst_cluster-test-v2.png", final_plot, base_width = 20, base_height = 11, dpi = 150)
-
+save_plot("C:/Users/jdanielou/Desktop/comparaison_maps_sss_cluster-test-v2.png", final_plot, base_width = 20, base_height = 11, dpi = 150)
