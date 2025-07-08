@@ -105,7 +105,7 @@ oni_hycom = calculate_oni(
 # -------------------------
 plot_density_per_category = function(oni_bran, oni_glorys, oni_hycom) {
   categories = c("VS_S", "M_W", "neutral", "W_M")
-  title = c("Très Fort - Fort", "Modéré - Faible", "Neutre", "Faible - Modéré")
+  title = c("Very Strong - Strong", "Moderate - Weak", "Neutral", "Weak - Moderate")
   i = 0
   
   colors = c(BRAN = "gold", GLORYS = "forestgreen", HYCOM = "dodgerblue", ERSST = "purple")
@@ -123,7 +123,7 @@ plot_density_per_category = function(oni_bran, oni_glorys, oni_hycom) {
     
     # Choix conditionnels des labels
     xlab_val <- if (cat %in% c("neutral", "W_M")) "ONI (°C)" else ""
-    ylab_val <- if (cat %in% c("neutral", "VS_S")) "Densité" else ""
+    ylab_val <- if (cat %in% c("neutral", "VS_S")) "Density" else ""
     
     # Étendre légèrement les bornes X
     all_vals <- c(val_bran, val_glorys, val_hycom, val_ersst)

@@ -1,7 +1,7 @@
 library(dplyr)
 library(lubridate)
 
-compute_anomalies_by_cluster = function(cluster_data_list, model) {
+compute_anomalies_by_cluster = function(cluster_data_list, model, var) {
   
   anomalies_list = list()
   
@@ -31,13 +31,13 @@ compute_anomalies_by_cluster = function(cluster_data_list, model) {
   }
   
   # Sauvegarde sur disque
-  saveRDS(anomalies_list, file = paste0("C:/Users/jdanielou/Desktop/rds/", model, "_anomalies.rds"))
+  saveRDS(anomalies_list, file = paste0("C:/Users/jdanielou/Desktop/rds/", model, "_anomalies_", var, ".rds"))
   
   return(anomalies_list)
 }
 
-model_by_cluster = readRDS("C:/Users/jdanielou/Desktop/rds/oisst_by_cluster.rds")
-compute_anomalies_by_cluster(cluster_data_list = model_by_cluster, model = "oisst")
+model_by_cluster = readRDS("C:/Users/jdanielou/Desktop/rds/oisst_by_cluster_sst.rds")
+compute_anomalies_by_cluster(cluster_data_list = model_by_cluster, model = "oisst", var = "sst")
 
 
 model_anomalis = readRDS(file = "C:/Users/jdanielou/Desktop/rds/hycom_anomalies.rds")
