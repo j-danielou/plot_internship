@@ -22,6 +22,7 @@ model_files  = paste0("C:/Users/jdanielou/Desktop/rds/", models, rds_suffix)
 obs_path     = paste0("C:/Users/jdanielou/Desktop/rds/", obs_file)
 save_path    = paste0("C:/Users/jdanielou/Desktop/rds/distance_", var_type, ".rds")
 plot_path    = paste0("C:/Users/jdanielou/Desktop/taylor-diagram-", var_type, "-test.png")
+distance_df   = readRDS(paste0("C:/Users/jdanielou/Desktop/rds/distance_df_", var_type, ".rds"))
 
 # --- Chargement des fichiers ---
 names(model_files) = models
@@ -76,6 +77,36 @@ for (i in seq_along(obs_cluster)) {
 
 names(df_all_hycom) = names(obs_cluster)
 
+
+# --- Étape 1 : moyenne de D par cluster
+cluster_order = distance_df %>%
+  group_by(cluster) %>%
+  summarise(mean_D = mean(D, na.rm = TRUE)) %>%
+  arrange(mean_D) %>%
+  mutate(new_cluster = paste0("cluster", row_number()))
+
+# --- Étape 2 : créer un mapping
+cluster_map = setNames(cluster_order$new_cluster, cluster_order$cluster)
+
+# distance_df
+distance_df$cluster = cluster_map[distance_df$cluster]
+
+# Renommer les listes (df_all, df_all_hycom, obs_cluster, results)
+rename_list = function(lst) {
+  lst[names(cluster_map)] |> purrr::set_names(cluster_map[names(cluster_map)])
+}
+
+df_all        = rename_list(df_all)
+df_all_hycom  = rename_list(df_all_hycom)
+obs_cluster   = rename_list(obs_cluster)
+
+
+# Redéfinir l’ordre des clusters
+clusters = names(df_all)
+
+cluster_labels = c("1" = "SPG", "2" = "TSW", "3" = "NWM",
+                   "4" = "TSE", "5" = "TSP", "6" = "PNG")
+
 # --- Taylor Diagram par cluster ---
 colors = colorful::divergencePalette(n = 8, col = c("dodgerblue3", "firebrick4"), intensity = 1)
 length(colors) = 6
@@ -84,7 +115,8 @@ clusters = names(df_all)
 results = list()
 diagram_start = FALSE
 
-x11(width = 12, height = 12)
+x11(width = 16, height = 8)
+par(mfrow = c(1,2))
 
 for (i in seq_along(clusters)) {
   cluster_df = df_all[[i]]
@@ -124,17 +156,19 @@ legend("topright",
        legend = c("GLORYS", "BRAN", "HYCOM"),
        col = "black", pch = model_pch,
        pt.cex = 1.2, cex = 1,
-       title = "Modèles",
-       inset = c(-0.06, -0.17), xpd = TRUE)
+       x.intersp = 0.5,
+       title = "Models",
+       inset = c(-0.06, -0.05), xpd = TRUE)
 
 legend("topright", 
-       legend = paste0("Cluster ", 1:6),
+       legend = cluster_labels,
        col = colors, pch = 15,
        pt.cex = 1.2, cex = 1,
+       x.intersp = 0.64,
        title = "Clusters",
-       inset = c(-0.06, 0.01), xpd = TRUE)
+       inset = c(-0.06, 0.12), xpd = TRUE)
 
-dev.copy(png, plot_path, width = 12, height = 12, units = "in", res = 150)
+dev.copy(png, plot_path, width = 16, height = 8, units = "in", res = 150)
 dev.off()
 
 # --- Calcul des distances au point idéal ---
@@ -155,6 +189,8 @@ for (clust in names(results)) {
     ))
   }
 }
+
+saveRDS(object = distance_df, file = paste0("C:/Users/jdanielou/Desktop/rds/distance_df_k7_", var_type, ".rds"))
 
 # --- Association distances → points spatiaux
 distance_maps = list(
